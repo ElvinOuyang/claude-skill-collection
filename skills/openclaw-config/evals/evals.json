@@ -1,0 +1,89 @@
+{
+  "skill_name": "openclaw-config",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just installed OpenClaw using Docker and the setup script finished. Now I need to hook it up to Anthropic and OpenAI. Where do I put my API keys and how do I make sure they don't end up hardcoded in the config file?",
+      "expected_output": "Clear instructions on using ~/.openclaw/.env for API keys with env var interpolation syntax in openclaw.json, covering both Anthropic and OpenAI providers.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1-env-file-location",
+          "description": "Recommends ~/.openclaw/.env as the location for API keys",
+          "type": "contains_concept",
+          "expected": "Response mentions ~/.openclaw/.env (or ~/.openclaw/.env file) as where to store API keys"
+        },
+        {
+          "id": "a1-interpolation-syntax",
+          "description": "Shows ${VAR_NAME} interpolation syntax for use in openclaw.json",
+          "type": "contains_concept",
+          "expected": "Response includes the ${...} env var interpolation syntax for referencing secrets inside openclaw.json"
+        },
+        {
+          "id": "a1-both-providers",
+          "description": "Covers both Anthropic and OpenAI provider configuration",
+          "type": "contains_concept",
+          "expected": "Response covers configuration for both anthropic and openai providers"
+        },
+        {
+          "id": "a1-no-hardcoding",
+          "description": "Warns against or avoids recommending hardcoding keys directly in openclaw.json",
+          "type": "contains_concept",
+          "expected": "Response does not instruct the user to put raw API key strings directly in openclaw.json, either by warning against it or by only showing the env var pattern"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My OpenClaw docker container is running on a home server and I want to access the dashboard from my laptop on the same WiFi network. Right now I can only hit it from the server itself. What do I need to change?",
+      "expected_output": "Instructions to change gateway.bind from 'loopback' to 'lan', using both the CLI config set command and direct openclaw.json edit, plus security warnings.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a2-bind-setting",
+          "description": "Identifies gateway.bind as the setting to change, and specifies 'lan' as the value",
+          "type": "contains_concept",
+          "expected": "Response clearly identifies changing gateway.bind to 'lan' as the solution"
+        },
+        {
+          "id": "a2-cli-command",
+          "description": "Includes the correct CLI command to change the bind setting",
+          "type": "contains_concept",
+          "expected": "Response includes 'docker compose run --rm openclaw-cli config set gateway.bind lan' or equivalent"
+        },
+        {
+          "id": "a2-security-warning",
+          "description": "Includes a security warning about not exposing port 18789 to the public internet",
+          "type": "contains_concept",
+          "expected": "Response warns against exposing the gateway to the public internet or advises caution about network exposure"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to add my Telegram bot to OpenClaw so I can chat with Claude through it. I have my bot token from BotFather. Walk me through connecting it.",
+      "expected_output": "Step-by-step guide to adding Telegram channel via the openclaw-cli channels add command, with correct flags.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a3-channels-add-command",
+          "description": "Includes the correct 'docker compose run --rm openclaw-cli channels add' command",
+          "type": "contains_concept",
+          "expected": "Response includes the docker compose run --rm openclaw-cli channels add command"
+        },
+        {
+          "id": "a3-telegram-flag",
+          "description": "Specifies --channel telegram in the channels add command",
+          "type": "contains_concept",
+          "expected": "Response includes --channel telegram flag in the channels add command"
+        },
+        {
+          "id": "a3-token-flag",
+          "description": "Specifies --token flag for passing the bot token",
+          "type": "contains_concept",
+          "expected": "Response includes --token flag (or equivalent) for passing the BotFather token"
+        }
+      ]
+    }
+  ]
+}
