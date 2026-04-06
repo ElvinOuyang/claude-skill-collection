@@ -1,0 +1,82 @@
+[
+  {
+    "query": "ship the ios build to testflight. branch is fix/ios-round4 and everything is merged to master. use the pumpkin scheme",
+    "should_trigger": true
+  },
+  {
+    "query": "can u deploy to testflight from the command line? i want the beta testers to be able to download the latest build today",
+    "should_trigger": true
+  },
+  {
+    "query": "upload the ios build to app store connect / testflight. the .ipa should be at ios-native/build/Pumpkin.ipa",
+    "should_trigger": true
+  },
+  {
+    "query": "push the latest ios build to testflight -- version 1.5, build 42. need to do it from CI since i dont have xcode open right now",
+    "should_trigger": true
+  },
+  {
+    "query": "send the build to testflight so i can test on my actual phone. xcode cloud isnt set up yet so need to do it manually from command line",
+    "should_trigger": true
+  },
+  {
+    "query": "how do i deploy ios app to testflight using xcrun altool or xcodebuild? want to automate this in a script",
+    "should_trigger": true
+  },
+  {
+    "query": "the v1.4 build is ready. deploy it to testflight so the family can start testing. bundle id is com.pumpkin.family",
+    "should_trigger": true
+  },
+  {
+    "query": "submit ios build to testflight from command line. i have an app-specific password and the .ipa is already built",
+    "should_trigger": true
+  },
+  {
+    "query": "cut a new testflight release with todays changes. the Pumpkin scheme in ios-native/ is the right one",
+    "should_trigger": true
+  },
+  {
+    "query": "deploy build 45 to testflight. use the ExportOptions.plist in ios-native/ for the export config",
+    "should_trigger": true
+  },
+  {
+    "query": "build the ios app locally to check if it compiles: cd ios-native && xcodebuild -scheme Pumpkin -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build",
+    "should_trigger": false
+  },
+  {
+    "query": "run the ios unit tests and show me the results before we ship",
+    "should_trigger": false
+  },
+  {
+    "query": "the xcode cloud workflow is failing -- can u check the ci_scripts/ folder and tell me whats wrong",
+    "should_trigger": false
+  },
+  {
+    "query": "deploy the web app to vercel: npx vercel --prod",
+    "should_trigger": false
+  },
+  {
+    "query": "ship it -- push the latest code to master and let vercel auto-deploy",
+    "should_trigger": false
+  },
+  {
+    "query": "install the app on the simulator so i can test the new features: xcodebuild build then install",
+    "should_trigger": false
+  },
+  {
+    "query": "archive the ios app for distribution -- want to check the archive exists before uploading",
+    "should_trigger": false
+  },
+  {
+    "query": "check the ios app store connect dashboard to see if the latest testflight build processing is done",
+    "should_trigger": false
+  },
+  {
+    "query": "create a new github release for v1.5 and attach the build artifacts",
+    "should_trigger": false
+  },
+  {
+    "query": "the ios app needs a final polish pass before we ship to testflight -- fix the spacing on the task detail screen",
+    "should_trigger": false
+  }
+]

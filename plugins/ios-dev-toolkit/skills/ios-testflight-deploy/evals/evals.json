@@ -1,0 +1,23 @@
+{
+  "skill_name": "ios-testflight-deploy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just fixed a scroll bug on the feature branch feat/fix-scroll-gap. Can you deploy it to TestFlight so I can test on my iPhone?",
+      "expected_output": "Should deploy directly from the feature branch without requiring a merge. Should bump build number, archive, and export+upload with API key auth.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I added a new /api/transcribe endpoint in the Next.js backend and the iOS TranscriptionService that calls it. The endpoint isn't deployed yet. Deploy to TestFlight so I can test voice input.",
+      "expected_output": "Should recognize the server dependency and advise merging/deploying the server changes first before deploying iOS to TestFlight. Should NOT just archive and upload from the branch.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "How do I set up TestFlight deployment? I've never done it from the command line before and I keep having to use Xcode's GUI which is slow.",
+      "expected_output": "Should walk through API key setup (App Store Connect), ExportOptions.plist creation, and the full deploy workflow. Should explain why API key auth is better than GUI sessions.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "openclaw-config",
+  "version": "1.0.0",
+  "description": "Configure OpenClaw self-hosted AI gateway via Docker",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

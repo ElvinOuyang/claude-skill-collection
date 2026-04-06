@@ -1,0 +1,82 @@
+[
+  {
+    "query": "run a full accessibility audit on ios-native/Pumpkin/Views/ -- VoiceOver, dynamic type, color contrast. heading into app store review and want to make sure nothing gets flagged",
+    "should_trigger": true
+  },
+  {
+    "query": "do a HIG compliance review of my task detail screen (ios-native/Pumpkin/Views/TaskDetailView.swift). i'm worried the custom navigation and action sheet placement might be non-standard",
+    "should_trigger": true
+  },
+  {
+    "query": "performance audit on ios-native/Pumpkin/Views/TaskListView.swift -- the list is slow on iPhone 12. check for unnecessary re-renders, image caching issues, off-main-thread work",
+    "should_trigger": true
+  },
+  {
+    "query": "can you check my SwiftUI code for anti-patterns? specifically looking at ios-native/Pumpkin/Views/ folder. things like force unwraps, UIKit usage where SwiftUI should be used, old deprecated APIs",
+    "should_trigger": true
+  },
+  {
+    "query": "accessibility check on the entire ios-native app before we ship v1.5. specifically worried about the new swipe actions and context menus being reachable via VoiceOver",
+    "should_trigger": true
+  },
+  {
+    "query": "theming audit -- we changed the design system tokens last week but i want to make sure all the views in ios-native/Pumpkin/Views/ are actually using the tokens and not hardcoded hex values",
+    "should_trigger": true
+  },
+  {
+    "query": "review ios-native/Pumpkin/Views/FamilyView.swift for HIG violations. custom nav bar, bottom sheet positioning, that kind of thing",
+    "should_trigger": true
+  },
+  {
+    "query": "technical quality check on my swiftui views -- check for memory leaks, retain cycles, unstructured concurrency, main actor isolation problems across ios-native/Pumpkin/",
+    "should_trigger": true
+  },
+  {
+    "query": "dynamic type audit on the chat screen. ios-native/Pumpkin/Views/ChatView.swift -- want to make sure the layout doesnt break when accessibility font sizes are cranked up",
+    "should_trigger": true
+  },
+  {
+    "query": "before submitting to the app store can u do an audit of the ios-native app? looking for anything that might fail review -- api usage violations, HIG issues, anything obviously wrong",
+    "should_trigger": true
+  },
+  {
+    "query": "the task list scrolling is janky. can you add a spring animation to the list items when they load in? ios-native/Pumpkin/Views/TaskListView.swift",
+    "should_trigger": false
+  },
+  {
+    "query": "do a ux critique of the ios app -- does the navigation make sense? is the information hierarchy clear? just a high-level design review",
+    "should_trigger": false
+  },
+  {
+    "query": "can you review the SwiftUI code style and architecture in ios-native/Pumpkin/Views/TaskDetailView.swift? want to know if the structure is clean and follows best practices",
+    "should_trigger": false
+  },
+  {
+    "query": "audit the web app's accessibility -- running at localhost:3000. check color contrast, aria labels, keyboard navigation",
+    "should_trigger": false
+  },
+  {
+    "query": "add haptic feedback to the task completion button in SwiftUI",
+    "should_trigger": false
+  },
+  {
+    "query": "polish the task detail screen before we ship it -- spacing, typography, color consistency. ios-native/Pumpkin/Views/TaskDetailView.swift",
+    "should_trigger": false
+  },
+  {
+    "query": "check for SwiftData model issues in ios-native/Pumpkin/Models/ -- mainly concerned about relationship handling and sync conflicts with supabase",
+    "should_trigger": false
+  },
+  {
+    "query": "run lint and type checks on the web app. npm run lint && npx tsc --noEmit",
+    "should_trigger": false
+  },
+  {
+    "query": "can u look at ios-native/Pumpkin/Services/SupabaseService.swift and tell me if the auth token refresh logic is correct",
+    "should_trigger": false
+  },
+  {
+    "query": "critique the visual design of the onboarding screens in the ios app -- color palette, font sizes, button placement",
+    "should_trigger": false
+  }
+]

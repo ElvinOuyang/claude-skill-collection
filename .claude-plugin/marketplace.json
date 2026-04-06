@@ -1,0 +1,40 @@
+{
+  "name": "claude-skill-collection",
+  "owner": {
+    "name": "Elvin Ouyang"
+  },
+  "metadata": {
+    "description": "Curated skills for iOS dev, web dev, and AI agent workflows",
+    "version": "2.0.0"
+  },
+  "plugins": [
+    {
+      "name": "ios-dev-toolkit",
+      "source": "./plugins/ios-dev-toolkit",
+      "description": "iOS/SwiftUI development skills: animation, audit, critique, polish, simulator nav, TestFlight deploy, and AXe automation",
+      "version": "1.0.0",
+      "keywords": ["ios", "swiftui", "xcode", "testflight", "simulator"]
+    },
+    {
+      "name": "web-dev-toolkit",
+      "source": "./plugins/web-dev-toolkit",
+      "description": "Web development skills: mobile workflows, Playwright test generation, and UI spec checking",
+      "version": "1.0.0",
+      "keywords": ["web", "playwright", "mobile", "testing", "ui"]
+    },
+    {
+      "name": "ai-dev-toolkit",
+      "source": "./plugins/ai-dev-toolkit",
+      "description": "AI development skills: prompt evaluation, spec-driven tests, and token-efficient project setup",
+      "version": "1.0.0",
+      "keywords": ["ai", "prompts", "testing", "evals", "token-efficiency"]
+    },
+    {
+      "name": "openclaw-config",
+      "source": "./plugins/openclaw-config",
+      "description": "Configure OpenClaw self-hosted AI gateway via Docker",
+      "version": "1.0.0",
+      "keywords": ["openclaw", "docker", "ai-gateway"]
+    }
+  ]
+}

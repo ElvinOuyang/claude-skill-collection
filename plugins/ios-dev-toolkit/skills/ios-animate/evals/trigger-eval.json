@@ -1,0 +1,82 @@
+[
+  {
+    "query": "ok so I just finished the settings screen in SwiftUI and it feels kinda dead when you toggle the switches and slide between sections. can you make it feel more alive? maybe some spring animations on the toggles and a nice transition when switching tabs",
+    "should_trigger": true
+  },
+  {
+    "query": "the task completion flow in ios-native/Pumpkin/Views/TaskDetailView.swift feels really flat right now -- user taps the checkmark and nothing happens visually. add a satisfying animation when a task gets marked done, maybe a bounce + haptic",
+    "should_trigger": true
+  },
+  {
+    "query": "adding haptic feedback to the swipe-to-delete action on task cards. looking at ios-native/Pumpkin/Views/TaskListView.swift. want a light impact when swipe threshold hits and a success notification when deleted",
+    "should_trigger": true
+  },
+  {
+    "query": "the onboarding flow slides feel abrupt. SwiftUI transitions between steps are just instant cuts. can we add some matched geometry and slide transitions to make it feel more polished?",
+    "should_trigger": true
+  },
+  {
+    "query": "i want micro-interactions on the bottom tab bar. when user switches tabs i want the icon to do a little spring bounce. looking at ios-native/Pumpkin/Views/MainTabView.swift",
+    "should_trigger": true
+  },
+  {
+    "query": "the notification bell in the header should wiggle when theres new notifications. how do i do a repeating shake animation in swiftui?",
+    "should_trigger": true
+  },
+  {
+    "query": "card expansion animation in TaskDetailView -- when user taps a task card it expands to full detail. right now its just an instant swap. i want a smooth expand with a slight spring overshoot",
+    "should_trigger": true
+  },
+  {
+    "query": "the progress ring in the family dashboard (ios-native/Pumpkin/Views/FamilyDashboardView.swift) should animate on appear. right now it just pops to the correct value instantly",
+    "should_trigger": true
+  },
+  {
+    "query": "context menu presentation on long press in my task cards is jarring. want to add a subtle scale-down on the card when context menu appears. ios-native/Pumpkin/Views/TaskCardView.swift",
+    "should_trigger": true
+  },
+  {
+    "query": "can u add transitions when the filter pills animate in/out in the task list? currently they just pop in when u switch filter. want a slide+fade from the side",
+    "should_trigger": true
+  },
+  {
+    "query": "review ios-native/Pumpkin/Views/TaskDetailView.swift for SwiftUI best practices and let me know if theres anything that should be refactored",
+    "should_trigger": false
+  },
+  {
+    "query": "the task list is laggy when scrolling on older devices. profiled it and looks like the cell rendering is slow. can you help optimize the SwiftUI list performance?",
+    "should_trigger": false
+  },
+  {
+    "query": "i need to add CSS transitions to the web task list when items are added/removed. the react app at app/components/tasks/TaskList.tsx",
+    "should_trigger": false
+  },
+  {
+    "query": "can you animate the loading spinner on the web version? its at components/ui/LoadingSpinner.tsx. just a simple rotation",
+    "should_trigger": false
+  },
+  {
+    "query": "how do i do a fade transition between Next.js pages? working on the web app not the iOS one",
+    "should_trigger": false
+  },
+  {
+    "query": "the SwiftUI list in ios-native/Pumpkin/Views/TaskListView.swift has accessibility issues -- VoiceOver labels are missing on the action buttons",
+    "should_trigger": false
+  },
+  {
+    "query": "add framer motion animation to the task cards in components/tasks/TaskCard.tsx when they appear on first load",
+    "should_trigger": false
+  },
+  {
+    "query": "do a full design critique of my iOS task detail screen. want to know if the layout is intuitive and if the hierarchy makes sense",
+    "should_trigger": false
+  },
+  {
+    "query": "my SwiftUI app crashes when rotating to landscape. need to debug the layout constraints in ProfileView.swift",
+    "should_trigger": false
+  },
+  {
+    "query": "run a quick HIG compliance check on ios-native/Pumpkin/Views/ -- want to make sure everything follows apple guidelines before submitting to app store",
+    "should_trigger": false
+  }
+]

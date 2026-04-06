@@ -1,0 +1,23 @@
+{
+  "skill_name": "ui-spec-checker",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Check the bottom navigation bar against the spec. The app is running at http://localhost:3000. The spec is at /Users/elvin/Documents/GitHub/hive-mind/docs/superpowers/specs/2026-03-27-hive-mind-ux-design.md. Save outputs to the outputs directory.",
+      "expected_output": "A structured findings doc for the bottom nav bar covering: tab count (should be 4: Tasks/Calendar/Chat/Mine), active tab color (should be rust #c2410c), inactive tab color (#a8a29e), any missing or extra tabs. Screenshots and computed style checks included.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Check the Task Overview screen (/tasks) against the spec. The app is running at http://localhost:3000. The spec is at /Users/elvin/Documents/GitHub/hive-mind/docs/superpowers/specs/2026-03-27-hive-mind-ux-design.md. Save outputs to the outputs directory.",
+      "expected_output": "Findings covering: page background color (warm cream #fdf8f4), task cards with 4px left border (not pill badges), search bar presence, tag filter pills, group headers (Today/This week/Later), screen title weight/size. Issues clearly flagged with spec vs actual values.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Check the Chat screen (/chat) against the spec. The app is running at http://localhost:3000. The spec is at /Users/elvin/Documents/GitHub/hive-mind/docs/superpowers/specs/2026-03-27-hive-mind-ux-design.md. Save outputs to the outputs directory.",
+      "expected_output": "Findings covering: chat header (Pumpkin icon + name + subtitle), user bubble color (dark brown #1c1917 not blue), Pumpkin bubble style (white with border), PUMPKIN label (rust, small, uppercase), input bar style. Issues clearly flagged.",
+      "files": []
+    }
+  ]
+}

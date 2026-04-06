@@ -1,0 +1,82 @@
+[
+  {
+    "query": "i updated the butler agent system prompt and want to run evals on it. it uses tool calls for task creation. can u package it as a skill and test whether the routing is correct?",
+    "should_trigger": true
+  },
+  {
+    "query": "the router classifier prompt in lib/butler/router.ts keeps misclassifying 'remind me to...' as casual_chat instead of task_action. want to write evals to catch this regression",
+    "should_trigger": true
+  },
+  {
+    "query": "run the pumpkin-butler skill evals from docs/skills/pumpkin-butler/ and show me which test cases are failing",
+    "should_trigger": true
+  },
+  {
+    "query": "i want to compare haiku vs sonnet on the task-action agent prompt. set up an eval that runs the same test cases against both models and grades the tool call correctness",
+    "should_trigger": true
+  },
+  {
+    "query": "the nudge evaluator prompt changed -- run the evals in docs/skills/nudge-evaluator/ to see if the scheduling behavior regressed",
+    "should_trigger": true
+  },
+  {
+    "query": "i need to test whether my AI system prompt correctly calls the create_task tool when given natural language requests. mock the tool and run assertions on the tool call args",
+    "should_trigger": true
+  },
+  {
+    "query": "set up eval cases for the profile-learner agent prompt. want to test that it correctly extracts habits from chat history and calls save_pattern with the right args",
+    "should_trigger": true
+  },
+  {
+    "query": "the false-action-claim detector in lib/butler/agent.ts needs eval coverage. write test cases where the model should trigger the detector vs when it shouldnt",
+    "should_trigger": true
+  },
+  {
+    "query": "iterating on a new system prompt for the task-query agent. want inline evals (not subagents) to keep token cost low. test 5 query patterns and grade whether the list_tasks tool was called with correct filters",
+    "should_trigger": true
+  },
+  {
+    "query": "grade the existing router-classifier evals in docs/skills/router-classifier/ -- run grade_evals.py and show me pass rates per category",
+    "should_trigger": true
+  },
+  {
+    "query": "write unit tests for the router classification logic in lib/butler/router.ts using vitest",
+    "should_trigger": false
+  },
+  {
+    "query": "the butler agent is making too many tool calls. profile it and see if we can reduce the max iterations from 3 to 2",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the system prompt in lib/butler/agents/task-action.ts -- the model is hallucinating task IDs that dont exist",
+    "should_trigger": false
+  },
+  {
+    "query": "compare haiku vs sonnet response quality for casual chat messages. just eyeball a few examples, nothing formal",
+    "should_trigger": false
+  },
+  {
+    "query": "the playwright tests in __tests__/ are all failing after the latest refactor. debug and fix them",
+    "should_trigger": false
+  },
+  {
+    "query": "write integration tests for the /api/butler route -- mock supabase and check that messages are saved correctly",
+    "should_trigger": false
+  },
+  {
+    "query": "i want to evaluate whether the task detail screen design is good. do a ux critique",
+    "should_trigger": false
+  },
+  {
+    "query": "benchmark the API response time for the butler endpoint under load. use k6 or similar",
+    "should_trigger": false
+  },
+  {
+    "query": "check if the agent config in lib/butler/agent-config.ts is reading the env vars correctly for provider overrides",
+    "should_trigger": false
+  },
+  {
+    "query": "run npm test and show me the failing vitest cases. there are a bunch of failures after the latest PR",
+    "should_trigger": false
+  }
+]

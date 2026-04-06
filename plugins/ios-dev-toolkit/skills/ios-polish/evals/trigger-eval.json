@@ -1,0 +1,82 @@
+[
+  {
+    "query": "the task detail screen is basically feature-complete. can u do a final polish pass before we ship? ios-native/Pumpkin/Views/TaskDetailView.swift -- fix any spacing, typography, color issues you see",
+    "should_trigger": true
+  },
+  {
+    "query": "pre-launch review of the ios app. we're about to submit to testflight for beta. can u go through all the views in ios-native/Pumpkin/Views/ and clean up any rough edges?",
+    "should_trigger": true
+  },
+  {
+    "query": "finishing touches on the onboarding flow. 3 screens in ios-native/Pumpkin/Views/Onboarding/. fix anything that looks unfinished -- inconsistent padding, misaligned text, that kind of thing",
+    "should_trigger": true
+  },
+  {
+    "query": "the chat screen needs a final quality pass before we merge the PR. ios-native/Pumpkin/Views/ChatView.swift -- make it feel polished and production-ready",
+    "should_trigger": true
+  },
+  {
+    "query": "can u polish my ios task list view? its functional but feels rough. ios-native/Pumpkin/Views/TaskListView.swift -- i want it to look like it belongs in the ios app store top 10",
+    "should_trigger": true
+  },
+  {
+    "query": "final cleanup on ProfileView before shipping. ios-native/Pumpkin/Views/ProfileView.swift -- fix spacing inconsistencies, make sure typography matches the design system, check accessibility labels",
+    "should_trigger": true
+  },
+  {
+    "query": "the family dashboard view looks kinda amateur. can u do a polish pass and make it feel more premium? ios-native/Pumpkin/Views/FamilyDashboardView.swift",
+    "should_trigger": true
+  },
+  {
+    "query": "we're doing a pre-submission review before the app store submission. go through ios-native/Pumpkin/Views/ and fix any obvious UX rough spots, spacing issues, HIG violations",
+    "should_trigger": true
+  },
+  {
+    "query": "the settings screen needs some polish -- the list sections have inconsistent spacing and the toggle labels are too small. ios-native/Pumpkin/Views/SettingsView.swift",
+    "should_trigger": true
+  },
+  {
+    "query": "final ios cleanup before we cut the v1.5 release. spot anything that needs fixing across the whole views folder? focus on visual consistency, typography hierarchy, HIG compliance",
+    "should_trigger": true
+  },
+  {
+    "query": "add a spring animation to task cards when the user completes a task. want a satisfying bounce effect",
+    "should_trigger": false
+  },
+  {
+    "query": "run a full accessibility audit on the ios app before app store submission",
+    "should_trigger": false
+  },
+  {
+    "query": "do a UX critique of the ios task detail screen -- give it a score and tell me what sucks",
+    "should_trigger": false
+  },
+  {
+    "query": "polish the web dashboard -- components/tasks/TaskList.tsx is looking rough. fix the spacing and add some better hover states",
+    "should_trigger": false
+  },
+  {
+    "query": "review ios-native/Pumpkin/Views/TaskDetailView.swift for SwiftUI best practices and modern API usage",
+    "should_trigger": false
+  },
+  {
+    "query": "the ios app is crashing on startup after the latest build. need to debug before we ship",
+    "should_trigger": false
+  },
+  {
+    "query": "build and deploy the ios app to testflight for the beta testers",
+    "should_trigger": false
+  },
+  {
+    "query": "the web app needs a polish pass on the task creation modal. fix the button alignment and add some better loading states",
+    "should_trigger": false
+  },
+  {
+    "query": "performance audit on ios-native/Pumpkin/Views/TaskListView.swift -- slow scrolling on older devices",
+    "should_trigger": false
+  },
+  {
+    "query": "check the ios simulator to see if the new task card design looks right on iPhone 15 Pro",
+    "should_trigger": false
+  }
+]

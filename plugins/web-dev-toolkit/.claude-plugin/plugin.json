@@ -1,0 +1,9 @@
+{
+  "name": "web-dev-toolkit",
+  "version": "1.0.0",
+  "description": "Web development skills: mobile workflows, Playwright test generation, and UI spec checking",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

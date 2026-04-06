@@ -1,0 +1,82 @@
+[
+  {
+    "query": "tap the Tasks tab in the simulator and take a screenshot so i can see how the new filter pills look",
+    "should_trigger": true
+  },
+  {
+    "query": "navigate to the task detail view in the ios simulator -- tap on any task in the list and screenshot the result. want to check the new layout",
+    "should_trigger": true
+  },
+  {
+    "query": "in the simulator, switch to the Chat tab and type 'add milk to shopping list' into the chat input and submit it. screenshot the response",
+    "should_trigger": true
+  },
+  {
+    "query": "can u verify the onboarding flow in the simulator? tap through all 3 screens and screenshot each one. want to see if the animations are working",
+    "should_trigger": true
+  },
+  {
+    "query": "check the mine tab in the ios simulator. navigate there and screenshot the screen -- want to see what the empty state looks like",
+    "should_trigger": true
+  },
+  {
+    "query": "fill in the add task form in the simulator -- name 'test task', assign to 'Elvin', set priority high. screenshot the result after saving",
+    "should_trigger": true
+  },
+  {
+    "query": "verify the new swipe actions are working in the simulator. swipe left on a task card and screenshot what appears",
+    "should_trigger": true
+  },
+  {
+    "query": "in the ios simulator, tap on the profile icon in the header and screenshot the profile sheet that should slide up",
+    "should_trigger": true
+  },
+  {
+    "query": "check what screen state the simulator is on right now. describe all the visible UI elements",
+    "should_trigger": true
+  },
+  {
+    "query": "navigate back to the home screen in the simulator and then into settings. tap the notifications toggle and screenshot before and after",
+    "should_trigger": true
+  },
+  {
+    "query": "review ios-native/Pumpkin/Views/MainTabView.swift and let me know if the tab navigation architecture looks correct",
+    "should_trigger": false
+  },
+  {
+    "query": "build the ios app and run the unit tests for the task model -- xcodebuild test",
+    "should_trigger": false
+  },
+  {
+    "query": "check the web app at localhost:3000 -- click on the Tasks tab and see if the filter bar appears",
+    "should_trigger": false
+  },
+  {
+    "query": "do an accessibility audit on the ios app -- check VoiceOver labels, dynamic type, all the usual stuff",
+    "should_trigger": false
+  },
+  {
+    "query": "deploy the ios app to testflight so the beta testers can try the new features",
+    "should_trigger": false
+  },
+  {
+    "query": "add haptic feedback when the user switches tabs in the bottom nav bar",
+    "should_trigger": false
+  },
+  {
+    "query": "use playwright to click the tasks tab on the web app at localhost:3000 and screenshot the result",
+    "should_trigger": false
+  },
+  {
+    "query": "run a design critique of the ios app navigation flow. is the tab bar placement intuitive?",
+    "should_trigger": false
+  },
+  {
+    "query": "look at the android emulator and tap on the notifications icon to verify the new badge count",
+    "should_trigger": false
+  },
+  {
+    "query": "the SwiftUI NavigationStack in ios-native/Pumpkin/Views/MainTabView.swift is causing weird back button behavior -- debug it",
+    "should_trigger": false
+  }
+]

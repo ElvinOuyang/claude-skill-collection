@@ -1,0 +1,82 @@
+[
+  {
+    "query": "can u give me a thorough design critique of my ios task list screen? screenshots attached. want to know how it scores on visual hierarchy, HIG, and whether it feels premium or amateur",
+    "should_trigger": true
+  },
+  {
+    "query": "evaluate the UX of my onboarding flow in the native ios app. 3 screens, user sets up family members. want honest feedback on cognitive load and whether the flow is intuitive",
+    "should_trigger": true
+  },
+  {
+    "query": "ios design review -- TaskDetailView.swift. be brutal. does the layout make sense? is the typography readable? does anything feel off from an apple HIG perspective?",
+    "should_trigger": true
+  },
+  {
+    "query": "i'm not happy with how the family dashboard looks in the ios app. can you do a full ux critique and give it a score? want specific callouts on whats working and whats not",
+    "should_trigger": true
+  },
+  {
+    "query": "review the chat screen design from a user experience standpoint. ios-native/Pumpkin/Views/ChatView.swift. specifically: does the message hierarchy make sense, are the bubbles readable, does it feel native",
+    "should_trigger": true
+  },
+  {
+    "query": "critique the bottom nav bar design -- we have 4 tabs (Tasks, Calendar, Chat, Mine). does the iconography make sense? are the labels clear? does the active state communicate well?",
+    "should_trigger": true
+  },
+  {
+    "query": "do a design quality evaluation of the task creation flow. from the FAB tap all the way to confirmation. rate it on ease of use, error prevention, and emotional feel",
+    "should_trigger": true
+  },
+  {
+    "query": "honest ux critique of ProfileView.swift -- looking at emotional resonance, information density, visual hierarchy. give me a numerical score too",
+    "should_trigger": true
+  },
+  {
+    "query": "evaluate my ios app's overall design language. does it feel cohesive? does the color system make sense? is the typography hierarchy consistent across screens?",
+    "should_trigger": true
+  },
+  {
+    "query": "critique the filter bar design in the task list. does it communicate the active state clearly? is the pill design appropriate? does it feel like it belongs on ios?",
+    "should_trigger": true
+  },
+  {
+    "query": "run an accessibility audit on ios-native/Pumpkin/Views/TaskListView.swift -- voiceover labels, dynamic type, color contrast ratios",
+    "should_trigger": false
+  },
+  {
+    "query": "polish the task detail screen -- fix the spacing and typography before we ship",
+    "should_trigger": false
+  },
+  {
+    "query": "add spring animations to the task cards when they appear in the list",
+    "should_trigger": false
+  },
+  {
+    "query": "review the SwiftUI code in TaskDetailView.swift for best practices and modern API usage",
+    "should_trigger": false
+  },
+  {
+    "query": "critique the web app landing page design -- colors, layout, copy. running at localhost:3000",
+    "should_trigger": false
+  },
+  {
+    "query": "do a code review of ios-native/Pumpkin/Views/ChatView.swift -- looking for bugs, performance issues, SwiftUI anti-patterns",
+    "should_trigger": false
+  },
+  {
+    "query": "check if my ios app passes HIG compliance -- specifically looking for violations that would fail app store review",
+    "should_trigger": false
+  },
+  {
+    "query": "design a new empty state screen for when a user has no tasks yet. ios-native app",
+    "should_trigger": false
+  },
+  {
+    "query": "the dark mode colors in my ios app look off. the gray shades dont have enough contrast. can u fix the color tokens?",
+    "should_trigger": false
+  },
+  {
+    "query": "evaluate whether the claude API prompt I wrote for the butler agent is working correctly -- it keeps misclassifying task queries as casual chat",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "name": "ai-dev-toolkit",
+  "version": "1.0.0",
+  "description": "AI development skills: prompt evaluation, spec-driven tests, and token-efficient project setup",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

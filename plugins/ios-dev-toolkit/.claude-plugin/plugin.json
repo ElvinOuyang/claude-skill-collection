@@ -1,0 +1,9 @@
+{
+  "name": "ios-dev-toolkit",
+  "version": "1.0.0",
+  "description": "iOS/SwiftUI development skills: animation, audit, critique, polish, simulator nav, TestFlight deploy, and AXe automation",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "query": "the design spec says the task cards should have a 4px left border not pill badges, but visually it looks wrong. can u check the web app at localhost:3000 against the spec at docs/superpowers/specs/2026-03-27-hive-mind-ux-design.md?",
+    "should_trigger": true
+  },
+  {
+    "query": "verify the UI implementation matches the design spec. app is at localhost:3000. looking specifically at the bottom nav colors -- spec says rust #c2410c for active state but it looks orange to me",
+    "should_trigger": true
+  },
+  {
+    "query": "run a visual regression check on the chat screen. compare what's at localhost:3000/chat against the ux design spec",
+    "should_trigger": true
+  },
+  {
+    "query": "we just shipped the v1.5 filter bar. check that the implementation matches the spec -- colors, pill sizing, active state. app is running at localhost:3000",
+    "should_trigger": true
+  },
+  {
+    "query": "can u catch any visual regressions in the web app? spec is at docs/superpowers/specs/ and the app is at localhost:3000. screenshot each main screen and compare",
+    "should_trigger": true
+  },
+  {
+    "query": "the design doc says group headers should use a specific font size and weight but the web app doesnt match. verify the tasks page against spec using playwright",
+    "should_trigger": true
+  },
+  {
+    "query": "UI spec check on the task creation modal. i think the button placement is wrong compared to the spec. localhost:3000",
+    "should_trigger": true
+  },
+  {
+    "query": "check all 4 main screens (tasks, calendar, chat, mine) against the ux design spec. look for color, spacing, or component shape mismatches",
+    "should_trigger": true
+  },
+  {
+    "query": "after the CSS refactor i want to make sure nothing drifted from the spec. run a full spec check on localhost:3000 and produce a bug report",
+    "should_trigger": true
+  },
+  {
+    "query": "the onboarding flow looks different from the mockups. verify localhost:3000/onboarding against the spec and list any discrepancies",
+    "should_trigger": true
+  },
+  {
+    "query": "run the ios simulator and screenshot the task list -- i want to see how the new filter pills look on device",
+    "should_trigger": false
+  },
+  {
+    "query": "the web app CSS is broken after the latest deploy. debug the styling issue in components/tasks/TaskList.tsx",
+    "should_trigger": false
+  },
+  {
+    "query": "do a UX critique of the web task list -- is the information hierarchy clear? does the layout make sense?",
+    "should_trigger": false
+  },
+  {
+    "query": "run playwright e2e tests in __tests__/e2e/ against localhost:3000 and report failures",
+    "should_trigger": false
+  },
+  {
+    "query": "check the web app for accessibility issues -- axe-core, color contrast, keyboard navigation. app at localhost:3000",
+    "should_trigger": false
+  },
+  {
+    "query": "the react component in components/tasks/TaskCard.tsx doesnt match the figma file. update the component to match the design",
+    "should_trigger": false
+  },
+  {
+    "query": "review the ios app design against the spec doc at docs/superpowers/specs/ -- want to verify the native app matches the intended design",
+    "should_trigger": false
+  },
+  {
+    "query": "verify the api returns the correct data by hitting localhost:3000/api/butler with a test message",
+    "should_trigger": false
+  },
+  {
+    "query": "polish the web task list component -- fix the spacing and typography so it looks cleaner",
+    "should_trigger": false
+  },
+  {
+    "query": "use playwright to test the task creation flow end-to-end -- fill the form, submit, verify the task appears in the list",
+    "should_trigger": false
+  }
+]
