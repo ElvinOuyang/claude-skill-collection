@@ -38,6 +38,17 @@ digraph nav {
 }
 ```
 
+## Session Start Checklist
+
+Before your first tap in a session, verify the environment is current:
+
+1. **Check SIMULATOR_MAP.md freshness** -- read the `last-verified` date at the top. If it's older than the current build or the app's UI has changed since then, re-run `axe describe-ui --udid $UDID` and update stale entries before relying on mapped coordinates.
+2. **Confirm UDID** -- run `xcrun simctl list devices booted` and compare against the UDID in SIMULATOR_MAP.md. A mismatch means the map is for a different simulator.
+3. **Find the newest build before installing** -- never hardcode a DerivedData path. Always discover it fresh:
+   ```bash
+   find ~/Library/Developer/Xcode/DerivedData -name "*.app" -path "*/Build/Products/Debug-iphonesimulator/*" -maxdepth 5 | xargs ls -td | head -1
+   ```
+
 ## Quick Reference
 
 | Task | Command |
@@ -136,4 +147,6 @@ axe tap --label "Switch to voice input" --udid $UDID & \
 | Tab items not tappable by label | Known SwiftUI limitation — add to SIMULATOR_MAP |
 | Tap lands during animation | Add `--pre-delay 0.5` or use `--wait-timeout` in batch |
 | Stale SIMULATOR_MAP | Re-run `axe describe-ui`, update the map |
+| 2+ consecutive failed taps | Stop tapping. Re-run `axe describe-ui --udid $UDID` to refresh element state -- the layout likely changed or coordinates drifted |
+| Installing a stale DerivedData build | Never hardcode the `.app` path. Use `find ... \| xargs ls -td \| head -1` to discover the newest build before every `xcrun simctl install` (see Session Start Checklist) |
 | Discovering new elements but not saving them | Always update SIMULATOR_MAP.md after finding new entry points |
