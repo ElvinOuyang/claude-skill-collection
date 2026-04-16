@@ -16,6 +16,7 @@ Then install the plugins you need:
 /plugin install ios-dev-toolkit@claude-skill-collection
 /plugin install web-dev-toolkit@claude-skill-collection
 /plugin install ai-dev-toolkit@claude-skill-collection
+/plugin install harness-engineering-toolkit@claude-skill-collection
 /plugin install openclaw-config@claude-skill-collection
 ```
 
@@ -57,6 +58,17 @@ Skills for iterating on AI agent prompts, generating tests, and optimizing proje
 | spec-driven-tests | Generate tests from specs, PRDs, and implementation plans |
 | token-efficient-setup | Set up CLAUDE.md with token efficiency rules |
 
+### harness-engineering-toolkit
+
+Mechanical enforcement for Claude Code mandatory workflows.
+
+| Skill | Description |
+|---|---|
+| harness-setup | Bootstrap a complete harness system with living docs, hooks, and commands |
+| harness-add-living-doc | Add a new doc to every enforcement touchpoint in an existing harness |
+| harness-extend | Add phases, scopes, hooks, or slash commands to an existing harness |
+| harness-troubleshoot | Diagnose and fix harness issues (loops, scope mismatches, stale state) |
+
 ### openclaw-config
 
 | Skill | Description |
@@ -77,6 +89,9 @@ claude-skill-collection/
     │   ├── .claude-plugin/plugin.json
     │   └── skills/
     ├── ai-dev-toolkit/
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/
+    ├── harness-engineering-toolkit/
     │   ├── .claude-plugin/plugin.json
     │   └── skills/
     └── openclaw-config/

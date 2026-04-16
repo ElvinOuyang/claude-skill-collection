@@ -1,0 +1,9 @@
+{
+  "name": "harness-engineering-toolkit",
+  "version": "1.0.0",
+  "description": "Mechanical enforcement for Claude Code mandatory workflows: bootstrap harness systems, manage living docs, extend enforcement infrastructure, and troubleshoot issues",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}
