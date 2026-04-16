@@ -35,6 +35,13 @@
       "description": "Configure OpenClaw self-hosted AI gateway via Docker",
       "version": "1.0.0",
       "keywords": ["openclaw", "docker", "ai-gateway"]
+    },
+    {
+      "name": "harness-engineering-toolkit",
+      "source": "./plugins/harness-engineering-toolkit",
+      "description": "Mechanical enforcement for Claude Code mandatory workflows: bootstrap harness systems, manage living docs, extend enforcement infrastructure, and troubleshoot issues",
+      "version": "1.0.0",
+      "keywords": ["harness", "hooks", "enforcement", "workflow", "claude-code"]
     }
   ]
 }
