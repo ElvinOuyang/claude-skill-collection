@@ -11,8 +11,8 @@ The motivating bug: commit `e1fdd07` added the `harness-engineering-toolkit` plu
 ## Goals
 
 - Detect drift between `plugins/*/` directories and `marketplace.json` registered plugins
-- Nudge Claude exactly once per distinct drift state (no infinite loops)
-- Stay advisory: if Claude decides not to fix, allow stop on the next attempt
+- Nudge Claude once per distinct drift state, then auto-release on the next Stop within a 120s cooldown (no infinite loops; matches harness convention)
+- Stay advisory: if Claude decides not to fix, the next Stop succeeds
 - Zero new dependencies beyond what the repo already uses (`jq`, bash, standard POSIX tools)
 
 ## Non-Goals (v1)
@@ -27,13 +27,11 @@ The motivating bug: commit `e1fdd07` added the `harness-engineering-toolkit` plu
 
 ### Components
 
-**`.claude/hooks/check-marketplace-sync.sh`** — single bash script, the entire detection logic.
+**`.claude/scripts/check-marketplace-sync.sh`** — single bash script, the entire detection logic. Located under `scripts/` to match the harness convention.
 
 **`.claude/settings.json`** — wires the script as a `Stop` hook. Committed so all collaborators get the same enforcement.
 
-**`.claude/state/marketplace-sync-warned.txt`** — single-line file holding the SHA-256 hash of the last drift state Claude was warned about. Gitignored; ephemeral per checkout.
-
-**`.gitignore`** — adds `.claude/state/` so warning markers never leak into commits.
+**`/tmp/marketplace-sync-<repo-cksum>`** — loop-detection state: 3 lines (hash, count, timestamp). Per-machine, outside the repo, no gitignore needed. Matches the harness toolkit's stop-gate convention.
 
 ### Data flow
 
@@ -41,7 +39,8 @@ The motivating bug: commit `e1fdd07` added the `harness-engineering-toolkit` plu
 Claude attempts Stop
         │
         ▼
-.claude/hooks/check-marketplace-sync.sh fires
+.claude/scripts/check-marketplace-sync.sh fires
+(wired with `cd $(git rev-parse --show-toplevel)` so cwd = repo root)
         │
         ▼
 Read registered: jq -r '.plugins[].name' .claude-plugin/marketplace.json
@@ -53,32 +52,28 @@ Compute set diff:
   orphaned     = registered \ on-disk
         │
         ▼
-drift = "unregistered:<list>|orphaned:<list>"
-hash  = sha256(drift)
+RESULT = formatted reason string (empty if no drift)
+hash   = cksum(RESULT)
         │
         ▼
-If drift is empty:                    → exit 0 (silent allow stop)
-Else if hash matches state file:      → exit 0 (already nudged this state)
-Else:                                  → write hash to state file
-                                        emit reminder to stderr
-                                        exit 2 (block stop, Claude sees reminder)
+If RESULT empty:                       → rm loop-key, exit 0 (silent allow stop)
+Else apply harness loop-detection:
+  - If same hash within COOLDOWN_SECS=120s and BLOCK_COUNT > MAX_BLOCKS=1
+                                       → exit 0 (auto-release: already nudged)
+  - Else                               → write (hash,count,ts) to /tmp loop-key
+                                          echo '{"decision":"block","reason":RESULT}'
+                                          exit 0  (Claude sees reason in chat)
 ```
 
-### Reminder format (emitted to stderr on first drift detection)
+### Reminder format (becomes the `reason` field in the JSON block payload)
+
+Single-line reason (avoids JSON-newline escaping complexity, mirrors harness convention):
 
 ```
-[marketplace-sync] Drift detected between plugins/ and .claude-plugin/marketplace.json.
-
-Unregistered plugin(s) on disk (missing from marketplace.json):
-  - <name>   (read plugins/<name>/.claude-plugin/plugin.json for metadata)
-
-Orphaned entries in marketplace.json (no matching directory):
-  - <name>
-
-To fix: edit .claude-plugin/marketplace.json and add/remove entries to match.
-This is a one-time nudge per drift state. If you choose not to fix, the next
-Stop will succeed silently.
+[marketplace-sync] Drift between plugins/ and .claude-plugin/marketplace.json. Unregistered on disk: <name1>, <name2>. Orphaned in manifest: <name3>. Fix: edit .claude-plugin/marketplace.json (read plugins/<name>/.claude-plugin/plugin.json for metadata). One-time nudge per drift state; next Stop on the same drift will auto-release.
 ```
+
+When a section is empty, omit it (e.g. only `Unregistered on disk: ...` if nothing is orphaned). Quotes inside the reason are escaped via `sed 's/"/\\"/g'` before interpolation.
 
 ## Detection logic detail
 
@@ -99,41 +94,80 @@ registered=$(jq -r '.plugins[].name' .claude-plugin/marketplace.json | sort -u)
 
 ### Set diff
 
+`comm` requires sorted input; `printf '%s\n' "$var"` on an empty var produces a blank line that `comm` treats as an entry, so guard for empty:
+
 ```bash
-unregistered=$(comm -23 <(printf '%s\n' "$on_disk") <(printf '%s\n' "$registered"))
-orphaned=$(comm -13 <(printf '%s\n' "$on_disk") <(printf '%s\n' "$registered"))
+diff_unique() {
+  # diff_unique <left> <right> <comm-flag>  → lines in left not in right
+  local left="$1" right="$2" flag="$3"
+  if [ -z "$left" ]; then echo ""; return; fi
+  comm "$flag" <(printf '%s\n' "$left") <(printf '%s\n' "${right:- }")
+}
+unregistered=$(diff_unique "$on_disk" "$registered" -23)
+orphaned=$(diff_unique "$registered" "$on_disk" -23)
 ```
 
-### Hash & state
+### Build reason and apply harness loop-detection
+
+Follows the canonical pattern in `plugins/harness-engineering-toolkit/skills/harness-extend/SKILL.md` (Stop — Blocking section). Loop-detection block is copied verbatim from that reference:
 
 ```bash
-state_dir=".claude/state"
-state_file="$state_dir/marketplace-sync-warned.txt"
-mkdir -p "$state_dir"
-
-drift_payload="unregistered:${unregistered}|orphaned:${orphaned}"
-current_hash=$(printf '%s' "$drift_payload" | shasum -a 256 | awk '{print $1}')
-
-if [[ -f "$state_file" ]] && [[ "$(cat "$state_file")" == "$current_hash" ]]; then
-  exit 0   # already nudged for this exact drift
+# Build single-line reason (empty = no drift = pass)
+RESULT=""
+if [ -n "$unregistered" ] || [ -n "$orphaned" ]; then
+  parts="[marketplace-sync] Drift between plugins/ and .claude-plugin/marketplace.json."
+  [ -n "$unregistered" ] && parts="$parts Unregistered on disk: $(echo "$unregistered" | paste -sd, -)."
+  [ -n "$orphaned" ]     && parts="$parts Orphaned in manifest: $(echo "$orphaned" | paste -sd, -)."
+  parts="$parts Fix: edit .claude-plugin/marketplace.json (read plugins/<name>/.claude-plugin/plugin.json for metadata). One-time nudge per drift state."
+  RESULT="$parts"
 fi
-printf '%s\n' "$current_hash" > "$state_file"
+
+# --- Harness loop-detection (copied from harness-extend reference) ---
+MAX_BLOCKS=1
+COOLDOWN_SECS=120
+REPO_PATH=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+LOOP_KEY="/tmp/marketplace-sync-$(printf '%s' "$REPO_PATH" | cksum | cut -d' ' -f1)"
+
+if [ -z "$RESULT" ]; then
+  rm -f "$LOOP_KEY"
+  exit 0
+fi
+
+REASON_HASH=$(printf '%s' "$RESULT" | cksum | cut -d' ' -f1)
+BLOCK_COUNT=0
+if [ -f "$LOOP_KEY" ]; then
+  STORED_HASH=$(sed -n '1p' "$LOOP_KEY" 2>/dev/null || echo "")
+  STORED_COUNT=$(sed -n '2p' "$LOOP_KEY" 2>/dev/null || echo "0")
+  STORED_TS=$(sed -n '3p' "$LOOP_KEY" 2>/dev/null || echo "0")
+  NOW=$(date +%s)
+  if [ "$REASON_HASH" = "$STORED_HASH" ] && [ $((NOW - STORED_TS)) -le "$COOLDOWN_SECS" ]; then
+    BLOCK_COUNT=$STORED_COUNT
+  fi
+fi
+BLOCK_COUNT=$((BLOCK_COUNT + 1))
+printf '%s\n%s\n%s\n' "$REASON_HASH" "$BLOCK_COUNT" "$(date +%s)" > "$LOOP_KEY"
+if [ "$BLOCK_COUNT" -gt "$MAX_BLOCKS" ]; then
+  exit 0   # auto-release: same drift repeated within cooldown
+fi
+# --- End loop-detection ---
+
+ESCAPED=$(printf '%s' "$RESULT" | sed 's/"/\\"/g')
+echo "{\"decision\": \"block\", \"reason\": \"${ESCAPED}\"}"
 ```
 
 ## Settings wiring
 
-`.claude/settings.json` (new file):
+`.claude/settings.json` (new file). Matches the harness Stop-hook wiring convention — no `matcher` (Stop has no tool name to match on), explicit `cd` to repo root so the script's relative paths resolve:
 
 ```json
 {
   "hooks": {
     "Stop": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-marketplace-sync.sh"
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && bash .claude/scripts/check-marketplace-sync.sh"
           }
         ]
       }
@@ -141,8 +175,6 @@ printf '%s\n' "$current_hash" > "$state_file"
   }
 }
 ```
-
-`$CLAUDE_PROJECT_DIR` is set by the harness so the path resolves regardless of cwd.
 
 ## Error handling
 
@@ -153,35 +185,37 @@ printf '%s\n' "$current_hash" > "$state_file"
 
 ## Loop-safety contract
 
-Exactly one nudge per distinct drift state per checkout. Drift state is fully captured by the sorted `(unregistered, orphaned)` pair. Examples:
+`MAX_BLOCKS=1`, `COOLDOWN_SECS=120`. Drift state is fully captured by the cksum of the formatted `RESULT` reason string. Behavior:
 
-| Scenario                                | Behavior                                  |
-|-----------------------------------------|-------------------------------------------|
-| No drift                                | exit 0 silently, every time               |
-| New unregistered plugin appears         | exit 2 with nudge, write hash             |
-| Same drift on next Stop                 | exit 0 (hash matches), no re-nudge        |
-| Claude registers it → drift gone        | exit 0 silently                           |
-| Different new plugin appears            | exit 2 with nudge (hash differs)          |
-| Same drift but state file deleted       | exit 2 with nudge (clean slate)           |
+| Scenario                                            | Behavior                                            |
+|-----------------------------------------------------|-----------------------------------------------------|
+| No drift                                            | rm loop-key, exit 0 silently                        |
+| New drift appears                                   | block once with reason, write `(hash,1,ts)` to /tmp |
+| Same drift on next Stop within 120s                 | count → 2 → exit 0 (auto-release)                   |
+| Same drift after 120s gap                           | block again (cooldown expired, count resets)        |
+| Claude fixes drift                                  | rm loop-key, exit 0                                 |
+| Different drift hash within cooldown                | block with new reason, count resets                 |
 
-The state file is gitignored, so a fresh clone or `rm -rf .claude/state` resets the nudge.
+The /tmp loop-key is per-machine and per-repo (cksum of `git rev-parse --show-toplevel`). Survives Claude Code session boundaries. Reboot or `rm /tmp/marketplace-sync-*` resets the counter.
 
 ## Testing plan
 
-Manual verification (no automated test framework in this repo):
+Manual verification (no automated test framework in this repo). Run from repo root; remove `/tmp/marketplace-sync-*` between tests for clean state.
 
-1. **Baseline (no drift):** with current state, run `bash .claude/hooks/check-marketplace-sync.sh < /dev/null`; expect exit 0, no output.
-2. **Unregistered drift:** temporarily remove the harness entry from `marketplace.json`, run the hook; expect exit 2, stderr names `harness-engineering-toolkit` as unregistered. Run again; expect exit 0 (already warned).
-3. **Orphaned drift:** restore harness entry, then add a fake `"name": "ghost-plugin"` entry to `marketplace.json`; run hook; expect exit 2 naming `ghost-plugin` as orphaned.
-4. **State change re-nudges:** with a drift active and warned, introduce a second drift; expect exit 2 again (hash differs).
-5. **Tooling gap:** rename `jq` temporarily (or run with `PATH=/usr/bin`); expect exit 0 with stderr error log, not a block.
-6. **End-to-end:** in a real Claude Code session, intentionally add a plugin without registering, ask Claude to stop, verify the reminder lands and Claude can act on it.
+1. **Baseline (no drift):** with current state, run `bash .claude/scripts/check-marketplace-sync.sh < /dev/null`; expect exit 0, no stdout.
+2. **Unregistered drift:** temporarily remove the harness entry from `marketplace.json`, run the hook; expect exit 0 with stdout `{"decision":"block","reason":"[marketplace-sync] ... Unregistered on disk: harness-engineering-toolkit ..."}`. Run again immediately; expect exit 0 with no stdout (auto-release on count > MAX_BLOCKS).
+3. **Orphaned drift:** restore harness entry, then add a fake `"name": "ghost-plugin"` entry to `marketplace.json`; run hook; expect block JSON naming `ghost-plugin` as orphaned.
+4. **Hash-change re-nudges:** with a drift active and counted, introduce a second drift (different plugin); expect block JSON again (new hash resets count).
+5. **Cooldown expiry:** trigger a drift, wait 121s, run again; expect block JSON again (counter reset by cooldown).
+6. **Tooling gap:** rename `jq` temporarily (or run with `PATH=/usr/bin`); expect exit 0 with stderr error log, no JSON to stdout, no block.
+7. **End-to-end:** in a real Claude Code session, intentionally add a plugin without registering, ask Claude to stop, verify the reason text lands in the chat and Claude can act on it.
 
-Restore `marketplace.json` after manual tests.
+Restore `marketplace.json` and clear `/tmp/marketplace-sync-*` after manual tests.
 
 ## File checklist
 
 - `docs/superpowers/specs/2026-04-16-marketplace-sync-hook-design.md` — this file
-- `.claude/hooks/check-marketplace-sync.sh` — new, executable
+- `.claude/scripts/check-marketplace-sync.sh` — new, executable (chmod +x)
 - `.claude/settings.json` — new
-- `.gitignore` — append `.claude/state/`
+
+No `.gitignore` change required — loop-detection state lives in `/tmp`.
