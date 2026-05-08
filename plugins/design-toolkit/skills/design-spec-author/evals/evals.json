@@ -1,0 +1,62 @@
+{
+  "skill_name": "design-spec-author",
+  "evals": [
+    {
+      "id": 1,
+      "name": "initial-author-from-ios-codebase",
+      "prompt": "We don't have a DESIGN.md yet. Draft one from the current codebase — this is a SwiftUI iOS app at the repo root. Walk me through the values you find before writing the file.",
+      "expected_output": "Plan that runs the bundled iOS extractor (or equivalent codebase scan) FIRST, presents extracted values to the user grouped by the 6-section schema, surfaces inconsistencies for the user to resolve, asks the user for the visual theme description, and only then writes DESIGN.md to the project root. Must NOT just ask the user for values without scanning the code.",
+      "expectations": [
+        "response references scripts/extract_ios_tokens.py or describes scanning the iOS codebase before asking the user for values",
+        "response mentions the 6-section schema (visual theme, color palette, typography, components, layout/spacing)",
+        "response asks the user only for the visual theme description and inconsistency resolution, not for raw token values",
+        "response writes DESIGN.md to project root or docs/DESIGN.md, not a random path",
+        "response does not invent color or font values without showing where they came from in the code"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "refresh-stale-design-md-with-per-section-diff",
+      "prompt": "Our DESIGN.md is out of date — the codebase has evolved past it. Refresh it. The DESIGN.md is at docs/DESIGN.md, the app is a Tailwind + React web app.",
+      "expected_output": "Plan that re-scans the codebase with the web extractor, diffs observed-now against DESIGN.md per section, presents three options for each divergence (spec wins, impl wins, mark as divergence), applies the user's choices, and writes the refreshed DESIGN.md. Must NOT dump a unified diff and walk away.",
+      "expectations": [
+        "response describes scanning the web codebase (tailwind config, CSS vars, etc.) before diffing",
+        "response presents per-section diffs rather than one big unified diff",
+        "response offers the three options: spec wins / impl wins / mark as divergence",
+        "response references scripts/extract_web_tokens.py or equivalent web token scan",
+        "response preserves the existing DESIGN.md file structure where sections did not change"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "redirect-when-user-wants-visual-exploration",
+      "prompt": "I want to brainstorm a visual style for our new landing page — something cozy, maybe Y2K-ish. Help me draft a DESIGN.md.",
+      "expected_output": "Plan that recognizes this is style EXPLORATION, not codebase-grounded spec authoring (no codebase signal yet, vague vibe), and redirects to visual-ideation-moodboard FIRST to lock a style direction. Should explain that DESIGN.md authoring works best after a style is locked or after the codebase has visual choices to extract from.",
+      "expectations": [
+        "response redirects to visual-ideation-moodboard or names it explicitly as the right next step",
+        "response explains why style exploration comes before spec authoring (no codebase signal yet, or vague vibe)",
+        "response does not start scanning a non-existent codebase or invent values for a landing page that doesn't exist yet",
+        "response does not write a DESIGN.md immediately"
+      ]
+    }
+  ],
+  "trigger_evals": [
+    { "query": "we need a DESIGN.md for this iOS app, can you help me set one up", "should_trigger": true },
+    { "query": "draft a DESIGN.md from the current codebase — most of the colors are in Theme.swift and the rest are inline", "should_trigger": true },
+    { "query": "our DESIGN.md is super stale at this point. like, the spacing scale hasn't matched reality in months. can you reconcile it", "should_trigger": true },
+    { "query": "extract a design system from the existing app and write it down somewhere", "should_trigger": true },
+    { "query": "I tried to run the design audit but there's no DESIGN.md to audit against. what do I do", "should_trigger": true },
+    { "query": "the audit found 14 P1 gaps — I want to walk through them and decide section by section whether the spec or the impl should win, then update DESIGN.md", "should_trigger": true },
+    { "query": "set up a design spec for ppk-labs-llc. tailwind + nextjs. nothing exists yet so we need to bootstrap it from the code", "should_trigger": true },
+    { "query": "claude-design-inbound just dropped a tokens PR with a DESIGN.md draft. can you harmonize it with what's actually in the code right now?", "should_trigger": true },
+
+    { "query": "I'm exploring vibes for a new poster — something Y2K, glossy, lots of chrome. brainstorm some directions with me", "should_trigger": false },
+    { "query": "generate the chatbot avatar illustrations for the new release — we already have style-lock.md", "should_trigger": false },
+    { "query": "audit the running iOS app against DESIGN.md and give me a P0-P3 gap report", "should_trigger": false },
+    { "query": "what's our primary brand color again? I just need the hex", "should_trigger": false },
+    { "query": "I want a moodboard for our redesign — something cozy and editorial. find me 20 references on dribbble", "should_trigger": false },
+    { "query": "write a markdown README for this repo explaining what the app does", "should_trigger": false },
+    { "query": "the design QA flagged that the primary CTA is using #1E40AF instead of #2563EB on Settings. fix the code.", "should_trigger": false },
+    { "query": "convert this Figma export to design tokens JSON and ship it as a tokens-only PR", "should_trigger": false }
+  ]
+}
