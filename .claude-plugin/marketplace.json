@@ -42,6 +42,27 @@
       "description": "Mechanical enforcement for Claude Code mandatory workflows: bootstrap harness systems, manage living docs, extend enforcement infrastructure, and troubleshoot issues",
       "version": "1.0.0",
       "keywords": ["harness", "hooks", "enforcement", "workflow", "claude-code"]
+    },
+    {
+      "name": "design-toolkit",
+      "source": "./plugins/design-toolkit",
+      "description": "Design suite: visual ideation moodboards, browser-driven illustration asset pipeline, design-spec audits against running apps, and Claude Design handoff (inbound + outbound)",
+      "version": "1.0.0",
+      "keywords": ["design", "illustration", "moodboard", "playwright", "design-tokens"]
+    },
+    {
+      "name": "workflow-toolkit",
+      "source": "./plugins/workflow-toolkit",
+      "description": "Repeatable engineering rituals: post-merge sync, live runbook walkthroughs for external/multi-step processes, and adversarial review cycles before merge",
+      "version": "1.0.0",
+      "keywords": ["workflow", "git", "runbook", "adversarial-review", "pr"]
+    },
+    {
+      "name": "environment-toolkit",
+      "source": "./plugins/environment-toolkit",
+      "description": "Cross-project environment maintenance: env health diagnostics (git/docker/Xcode/MCP) and MCP pruning by token cost and failure rate",
+      "version": "1.0.0",
+      "keywords": ["environment", "diagnostics", "mcp", "git", "docker"]
     }
   ]
 }
