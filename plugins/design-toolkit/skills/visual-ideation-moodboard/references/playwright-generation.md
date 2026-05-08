@@ -2,11 +2,18 @@
 
 Shared between this skill and `chatbot-asset-pipeline`. Keep them in sync — the asset pipeline reuses every convention here.
 
-## Use the Playwright MCP, not raw `playwright`
+## Use direct Playwright with `launch_persistent_context` and `headless=False`
 
-The MCP gives us a persistent browser context the user can see. Raw `playwright` scripts spawn a headless browser the user can't watch, which kills the "is it doing it now?" visibility the user keeps asking for.
+Drive Chromium directly via the `playwright` Python or Node library. Two flags do all the work:
 
-If the user has only raw `playwright` installed, ask them to enable the Playwright MCP before continuing. Don't fall back to headless — the loss of visibility is more painful than the install step.
+- `headless=False` — the user can watch generations happen, which addresses their recurring "is it doing it now?" frustration
+- `launch_persistent_context(user_data_dir=...)` — cookies persist across runs, so the user logs in once per machine and the session stays alive indefinitely
+
+A reasonable `user_data_dir` is `~/.cache/visual-ideation/<provider>/` — keep ChatGPT and Gemini contexts separate.
+
+This is the user's stated preference: a Playwright instance, not the MCP wrapper. The full rationale and a minimal Python snippet live in `chatbot-asset-pipeline/references/tooling-rationale.md` — don't duplicate it here, but the gist is that direct Playwright with these flags already provides every property that motivated MCP usage, without the wrapper indirection.
+
+If only the Playwright MCP is available, that's an acceptable fallback. Install Playwright directly (`pip install playwright && playwright install chromium`) when you can.
 
 ## Login state
 

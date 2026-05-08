@@ -4,8 +4,9 @@ description: >
   Moodboard-first visual brainstorming that locks a style direction before any production
   illustration work begins. Scrapes references (Pinterest, Dribbble, web search, user-provided
   images), narrows on the user's favorites, distills the picks into a concrete style descriptor
-  (palette, line weight, texture, mood, era), generates 6 candidate variations through a
-  Playwright-driven ChatGPT (image-2) or Gemini (Nano Banana) session, and outputs a locked
+  (palette, line weight, texture, mood, era), generates 6 candidate variations through a direct
+  Playwright session (visible browser, persistent login) against ChatGPT (image-2) or Gemini
+  (Nano Banana), and outputs a locked
   style-prompt artifact (`style-lock.md`) that downstream skills like `chatbot-asset-pipeline`
   and `claude-design-inbound` consume. Standalone and reusable for posters, brand directions,
   UI illustration, mascots, marketing artwork — not just iOS asset replacement. Use whenever
@@ -44,7 +45,7 @@ Goal: 12–20 visual references collected into one viewable moodboard so the use
 Sources to pull from, in rough priority order:
 
 1. **User-provided** — anything they've already pasted, dropped in a folder, or pinned. Always include these first.
-2. **Pinterest / Dribbble / Behance** — search for the user's vibe phrases via Playwright if the user has a logged-in session, otherwise via web search and image URLs.
+2. **Pinterest / Dribbble / Behance** — search for the user's vibe phrases via a direct Playwright session (visible browser, persistent login — see `references/playwright-generation.md`) if the user has a logged-in session, otherwise via web search and image URLs.
 3. **General web search** — for less-mainstream styles ("Memphis design", "ligne claire", "risograph").
 4. **Existing project assets** — if the user is replacing assets in an existing app, scrape the current set so the moodboard can include "what we're moving away from" as a contrast.
 
@@ -82,7 +83,7 @@ Show the user the descriptor. Let them edit any row. **Do not** proceed to gener
 
 ### Phase 4: Generate 6 variations
 
-Drive a logged-in browser session (ChatGPT image-2 or Gemini Nano Banana) via Playwright to produce 6 variations against a single anchor subject. The anchor subject should be something representative of the project (e.g., for an iOS empty-state replacement, use the project's most-frequent empty-state metaphor; for a mascot, use a 3/4 portrait pose).
+Drive a logged-in browser session (ChatGPT image-2 or Gemini Nano Banana) via direct Playwright (`launch_persistent_context`, `headless=False`) to produce 6 variations against a single anchor subject. The anchor subject should be something representative of the project (e.g., for an iOS empty-state replacement, use the project's most-frequent empty-state metaphor; for a mascot, use a 3/4 portrait pose).
 
 Why 6 and not 4 or 12: 4 doesn't give enough variation for the user to triangulate; 12 makes the picking phase exhausting. 6 is the sweet spot from observed sessions.
 

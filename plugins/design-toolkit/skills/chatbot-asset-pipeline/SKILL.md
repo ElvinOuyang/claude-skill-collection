@@ -2,7 +2,8 @@
 name: chatbot-asset-pipeline
 description: >
   Browser-driven illustration asset pipeline. Drives a logged-in ChatGPT (image-2) or Gemini
-  (Nano Banana) session via the Playwright MCP to generate N production illustrations against
+  (Nano Banana) session via a direct Playwright instance (visible browser, persistent context)
+  to generate N production illustrations against
   a locked style prompt, captures each on a magenta (#FF00FF) chroma-key background, runs
   background removal to produce transparent PNGs, drops the results into the iOS asset catalog
   with @1x/@2x/@3x and Contents.json, and supports regeneration of broken or off-style assets.
@@ -43,9 +44,9 @@ If any are missing, ask before starting — silent guessing wastes the generatio
 
 ### Phase 1: Browser session setup
 
-Use the Playwright MCP — **not** raw `playwright` and **not** the computer-use MCP. See `references/tooling-rationale.md` for why; the short version is that the MCP gives the user a visible browser they can watch, which the user explicitly wants.
+Drive Chromium directly via the Playwright library — `launch_persistent_context(user_data_dir=..., headless=False)`. This is the user's explicit preference: a Playwright instance they can see and interact with, **not** the Playwright MCP wrapper, and **not** the computer-use MCP. The persistent context keeps the user logged in across runs (one login per machine, not per run); `headless=False` keeps the browser visible. See `references/tooling-rationale.md` for the full rationale and a minimal Python snippet.
 
-Open the chosen provider's chat UI. If a login prompt appears, pause and ask the user to sign in. Do not script the login (captcha + 2FA make it brittle, and the user has stable cookies once signed in).
+Open the chosen provider's chat UI. If a login prompt appears, pause and ask the user to sign in. Do not script the login (captcha + 2FA make it brittle, and cookies persist via the user_data_dir once signed in).
 
 ### Phase 2: Generation loop
 
@@ -106,7 +107,8 @@ If the user has cleanup-agent subagents available, dispatch them for the cleanup
 - **Login state lost mid-run.** The provider logged the user out. Pause, ask them to re-auth, resume — don't restart the whole batch.
 - **Style drift across assets.** Each asset must start a **new chat** with the full style-lock prompt. Reusing the same chat lets the model "evolve" the style, which is exactly what we don't want.
 - **"Is it doing it now?" silence.** Narrate every 2 assets. The browser is visible but easy to lose attention on during a long batch.
-- **Trying to use computer-use MCP for this.** It's coordinate-based and brittle. The Playwright MCP is the right tool — see `references/tooling-rationale.md`.
+- **Trying to use computer-use MCP for this.** It's coordinate-based and brittle. Direct Playwright with `headless=False` is the right tool — see `references/tooling-rationale.md`.
+- **Reaching for the Playwright MCP wrapper.** The MCP adds an indirection layer the user has flagged as friction. Use the `playwright` library directly with `launch_persistent_context` + `headless=False` — that gives every property (visibility, persistent cookies, selectors) the MCP would have provided.
 
 ## Cross-skill handoff
 
