@@ -111,19 +111,44 @@ Reply "confirm" to apply, or list the subset you want to disable.
 
 Always show the **fallback** column. The user's most common pushback is "wait, but how do I do X without the MCP?" -- pre-empt it.
 
-### Step 4: Disable on confirmation
+### Step 4: Disable on confirmation -- safe-write protocol
 
-Prefer the **disable** semantics over uninstall when possible -- it's reversible. In Claude Code's config that typically means moving the entry into a `disabledMcpServers` field or commenting it out, depending on what the host supports.
+`~/.claude.json` is the user's primary Claude Code config. A naive in-place `json.dump(data, open(path, "w"))` will corrupt it on any interruption (Ctrl-C, OOM, disk full, crash). The window between `open(..., "w")` and the final flush is when the file is empty/truncated. **Never write the live config that way.**
 
-If the host doesn't support a "disabled" state, copy the original entry into the reversible record (Step 5) **before** removing it from the active config.
+You MUST follow this order, every time:
+
+1. **Verify host semantics first.** The `disabledMcpServers` key is the convention this skill uses, but not every Claude Code version reads it back. Confirm the host actually honors it (check release notes, or test on a throwaway config) before relying on it for restore. If you can't confirm, fall back to "remove from `mcpServers` and keep the full original entry in the reversible record" -- restore is then a manual paste, but nothing silently re-enables.
+2. **Create the reversible record FIRST (Step 5), before mutating `~/.claude.json`.** If a crash happens mid-write, the user must still have a recovery path on disk. Record-after-mutation is unsafe.
+3. **Snapshot a timestamped backup before touching the file:** copy `~/.claude.json` -> `~/.claude.json.bak.YYYYMMDDHHMMSS`. This is the rollback target.
+4. **Write atomically:** write the new JSON to a temp file *in the same directory* (so rename is atomic on the same filesystem), `fsync` it, then `os.replace` over the original. Never write directly to the destination path.
+5. **Parse-validate after write:** re-open the destination, `json.load` it, and assert the expected shape (e.g. `mcpServers` is a dict, all targeted names are now under `disabledMcpServers`, untouched servers are still present byte-for-byte at the key level). If parsing or shape checks fail, immediately restore from the timestamped backup and stop. Do not retry blindly.
 
 ```bash
-# Sketch: move named MCPs into a disabled bucket in ~/.claude.json
+# Safe-write sketch: backup-first, atomic rename, parse-validate, rollback on failure.
 python3 - "$@" <<'PY'
-import json, sys, os, datetime
+import json, sys, os, shutil, tempfile, datetime, traceback
+
 to_disable = sys.argv[1:]
 path = os.path.expanduser("~/.claude.json")
-data = json.load(open(path))
+ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+backup = f"{path}.bak.{ts}"
+
+# 0. Sanity: original must parse before we touch anything.
+with open(path) as f:
+    original_text = f.read()
+try:
+    data = json.loads(original_text)
+except Exception as e:
+    sys.exit(f"refusing to mutate: original {path} does not parse: {e}")
+
+# 1. Reversible record FIRST (see Step 5). Do this before any mutation
+#    so a crash here leaves the live config untouched.
+write_reversible_record(data, to_disable)  # see Step 5
+
+# 2. Timestamped backup BEFORE mutation.
+shutil.copy2(path, backup)
+
+# 3. Compute the new state in memory.
 active = data.setdefault("mcpServers", {})
 disabled = data.setdefault("disabledMcpServers", {})
 moved = {}
@@ -131,12 +156,45 @@ for name in to_disable:
     if name in active:
         moved[name] = active.pop(name)
 disabled.update(moved)
-json.dump(data, open(path, "w"), indent=2)
+
+# 4. Atomic write: temp file in same dir -> fsync -> os.replace.
+dir_ = os.path.dirname(path) or "."
+fd, tmp = tempfile.mkstemp(prefix=".claude.json.", dir=dir_)
+try:
+    with os.fdopen(fd, "w") as f:
+        json.dump(data, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)  # atomic on same filesystem
+except Exception:
+    # write failed before replace; remove temp and bail. Original is intact.
+    try: os.unlink(tmp)
+    except FileNotFoundError: pass
+    raise
+
+# 5. Parse-validate after write. Roll back on any failure.
+try:
+    with open(path) as f:
+        verify = json.load(f)
+    assert isinstance(verify.get("mcpServers", {}), dict)
+    for name in moved:
+        assert name in verify.get("disabledMcpServers", {}), f"{name} missing post-write"
+        assert name not in verify.get("mcpServers", {}), f"{name} still active post-write"
+except Exception:
+    traceback.print_exc()
+    shutil.copy2(backup, path)  # rollback from timestamped backup
+    sys.exit(f"post-write validation failed; rolled back from {backup}")
+
 print("disabled:", list(moved.keys()))
+print("backup:", backup)
 PY
 ```
 
-### Step 5: Write the reversible record
+The four invariants -- **record-before-mutate**, **backup-before-mutate**, **temp+rename never in-place**, **parse-validate then rollback on failure** -- are non-negotiable. If you find yourself "just this once" calling `json.dump(data, open(path, "w"))` directly, stop and use the protocol above.
+
+### Step 5: Write the reversible record (BEFORE mutating config)
+
+This step runs *before* Step 4's mutation. The reversible record is the user's recovery path; it must exist on disk before the live config is touched.
 
 Write a project-level note (or user-level if there's no project) so the user can undo:
 
@@ -186,3 +244,4 @@ End the run with a short paragraph:
 - **Be reversible by default.** Move-to-disabled, with a saved config snippet, beats delete every time.
 - **Don't editorialize about MCPs you can't measure.** If you don't have evidence on usage or cost, say "unknown" -- guessing is how you turn off the user's daily driver.
 - **One audit per session.** This is a deliberate, batched action, not something to redo every time the conversation drifts near MCPs.
+- **Never write `~/.claude.json` in place.** Always: write reversible record first, then timestamped backup, then atomic temp-file + `os.replace`, then parse-validate, then rollback on any failure. A corrupted `~/.claude.json` breaks the user's entire Claude Code install.

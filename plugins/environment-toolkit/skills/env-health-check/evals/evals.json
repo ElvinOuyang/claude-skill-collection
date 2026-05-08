@@ -1,0 +1,80 @@
+{
+  "skill_name": "env-health-check",
+  "evals": [
+    {
+      "id": 0,
+      "name": "git-hung-check",
+      "prompt": "check if my git is hung",
+      "expected_output": "A diagnostic plan that uses macOS-compatible timeouts, wraps git network probes (ls-remote, fetch) in a timeout, parses git process elapsed time numerically (not string compare), and produces a P0/P1/P2/P3 punch list separating auto-fixes from user actions. Describe commands; do not actually run state-changing ones.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "macos-safe-timeout",
+          "text": "Output uses a macOS-compatible timeout pattern (run_with_timeout helper, gtimeout fallback, or shell-native background-PID-and-kill), NOT bare GNU `timeout`."
+        },
+        {
+          "id": "git-network-timeout-wrapped",
+          "text": "Output wraps git ls-remote and git fetch (--dry-run) calls in a timeout."
+        },
+        {
+          "id": "numeric-duration-parse",
+          "text": "Output parses git process elapsed time (etime) into numeric seconds before thresholding, not via string comparison on hh:mm:ss."
+        },
+        {
+          "id": "p0-p3-punch-list",
+          "text": "Output produces a P0/P1/P2/P3 punch list that separates auto-fixed items from user-action items."
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "docker-hanging-check",
+      "prompt": "what's wrong with my docker",
+      "expected_output": "A diagnostic plan that probes the docker daemon using a macOS-compatible timeout helper (not bare `timeout`), wraps every docker probe so a wedged daemon cannot hang the run, and produces a P0/P1/P2/P3 punch list separating auto-fixes from user actions. Describe commands; do not actually run state-changing ones.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "macos-safe-timeout",
+          "text": "Output uses a macOS-compatible timeout pattern (run_with_timeout helper, gtimeout fallback, or shell-native background-PID-and-kill), NOT bare GNU `timeout`."
+        },
+        {
+          "id": "git-network-timeout-wrapped",
+          "text": "Output wraps git ls-remote and git fetch (--dry-run) calls in a timeout (when git checks are run as part of the broader sweep)."
+        },
+        {
+          "id": "numeric-duration-parse",
+          "text": "Output parses process elapsed time (etime) into numeric seconds before thresholding, not via string comparison on hh:mm:ss."
+        },
+        {
+          "id": "p0-p3-punch-list",
+          "text": "Output produces a P0/P1/P2/P3 punch list that separates auto-fixed items from user-action items."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "full-env-health-check",
+      "prompt": "env health check",
+      "expected_output": "A complete diagnostic sweep across git, docker, Xcode, MCP servers, disk, and plugin loading. Uses a macOS-compatible timeout helper (not bare `timeout`), wraps every external probe (docker, git ls-remote, git fetch, git fsck) in the helper, parses git process elapsed time numerically, and ends with a P0/P1/P2/P3 punch list separating auto-fixes from user actions. Describe commands; do not actually run state-changing ones.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "macos-safe-timeout",
+          "text": "Output uses a macOS-compatible timeout pattern (run_with_timeout helper, gtimeout fallback, or shell-native background-PID-and-kill), NOT bare GNU `timeout`."
+        },
+        {
+          "id": "git-network-timeout-wrapped",
+          "text": "Output wraps git ls-remote and git fetch (--dry-run) calls in a timeout."
+        },
+        {
+          "id": "numeric-duration-parse",
+          "text": "Output parses git process elapsed time (etime) into numeric seconds before thresholding, not via string comparison on hh:mm:ss."
+        },
+        {
+          "id": "p0-p3-punch-list",
+          "text": "Output produces a P0/P1/P2/P3 punch list that separates auto-fixed items from user-action items."
+        }
+      ]
+    }
+  ]
+}

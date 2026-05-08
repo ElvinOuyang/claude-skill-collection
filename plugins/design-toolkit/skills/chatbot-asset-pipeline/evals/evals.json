@@ -1,0 +1,49 @@
+{
+  "skill_name": "chatbot-asset-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "name": "regen-broken-illustrations",
+      "prompt": "regenerate the broken illustration assets in our iOS app — the current placeholders look terrible and we need 6 onboarding scenes ASAP. our designer locked the style last week.",
+      "expected_output": "Skill engages, checks for design/style-lock.md, runs the magenta chroma-key + despill pipeline, and emits @1x/@2x/@3x scales that are integer point-equivalents.",
+      "assertions": [
+        {
+          "id": "no_magenta_halo_on_green_composite",
+          "text": "When the pipeline output is composited on a green (#00FF00) background, the alpha-feathered ring around the subject contains no pixels with strong magenta cast (R+B significantly higher than G)."
+        },
+        {
+          "id": "scales_are_integer_point_equivalents",
+          "text": "scale_ios_assets.py output satisfies size_3x = 3 * size_1x and size_2x = 2 * size_1x exactly (no flooring drift)."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "replace-placeholder-pngs",
+      "prompt": "replace the placeholder pngs in the iOS asset catalog at Assets.xcassets/Onboarding/. we have a style lock file at design/style-lock.md.",
+      "expected_output": "Skill drives the chatbot UI to produce magenta-bg images, strips magenta with despill, scales to @1x/@2x/@3x with proper integer alignment, and writes Contents.json.",
+      "assertions": [
+        {
+          "id": "no_magenta_halo_on_green_composite",
+          "text": "Composited result on green has no magenta halo at the alpha-feathered ring."
+        },
+        {
+          "id": "scales_are_integer_point_equivalents",
+          "text": "size_3x / size_1x == 3 exactly; size_2x / size_1x == 2 exactly."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "chatgpt-icon-gen-no-style-lock",
+      "prompt": "use chatgpt to generate the new icons for our paywall feature — like 4 of them, hero illustrations basically. we don't have any style guide yet, just whatever looks good.",
+      "expected_output": "Skill detects missing design/style-lock.md and redirects user to visual-ideation-moodboard skill before generating anything.",
+      "assertions": [
+        {
+          "id": "redirects_when_style_lock_missing",
+          "text": "Output explicitly mentions visual-ideation-moodboard and refuses to proceed without a style-lock.md."
+        }
+      ]
+    }
+  ]
+}

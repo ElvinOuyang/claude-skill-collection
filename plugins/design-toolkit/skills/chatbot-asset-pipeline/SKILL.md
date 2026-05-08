@@ -34,7 +34,7 @@ Before starting, collect:
 1. **Style lock** — `design/style-lock.md` (must exist and be user-approved)
 2. **Asset list** — names + 1-line subject descriptions for each illustration. For iOS, this is usually a list of empty-state / onboarding / paywall scenes.
 3. **Target catalog** — where to place output. For iOS that's `Assets.xcassets/<AssetName>.imageset/`. For web it's typically `public/illustrations/`.
-4. **Resolution** — for iOS, `@3x` is the source of truth; @2x and @1x are downscaled. Default source is 1024×1024 from the chat UI.
+4. **Resolution** — for iOS, `@3x` is the source of truth; @2x and @1x are downscaled. The three scales must represent the same point size, so the source dimensions must be divisible by 6 (LCM of 2 and 3) — otherwise `scale_ios_assets.py` pads with transparency up to the next multiple of 6 and rewrites @3x at the padded size. Default source is 1026×1026 (closest multiple of 6 to the chat UI's 1024×1024); ask the chatbot for that exact dimension or accept the auto-pad.
 5. **Provider** — ChatGPT (image-2) or Gemini (Nano Banana). Default to whichever the user has logged in.
 
 If any are missing, ask before starting — silent guessing wastes the generation budget.
@@ -65,7 +65,7 @@ If the UI throttles or returns a refusal, retry once with a softer phrasing; if 
 
 For each raw PNG, chroma-key out the magenta and produce a transparent PNG.
 
-Use the bundled `scripts/strip_magenta.py` — it handles the common edge case (anti-aliased magenta halos around the subject) by feathering the alpha threshold. White-background or "remove background" approaches produce the checkered-edge problem the user keeps hitting; magenta + chroma-key is robust.
+Use the bundled `scripts/strip_magenta.py`. It does two passes: (1) a chroma-key keyer that converts pure magenta to fully transparent and feathers a soft alpha ramp across anti-aliased edges, and (2) a **despill pass** that removes the magenta tint from any pixel that isn't fully transparent. The despill matters — feathering alone leaves edge pixels with magenta RGB under partial alpha, and when those get composited on a non-magenta background the magenta bleeds through as a pink fringe. White-background or generic "remove background" approaches produce the checkered-edge problem the user keeps hitting; magenta chroma-key + despill is robust.
 
 Output: `.asset-pipeline/transparent/<asset-name>.png`.
 
@@ -75,7 +75,7 @@ For iOS:
 
 1. For each asset, ensure `Assets.xcassets/<asset-name>.imageset/` exists.
 2. Place the transparent PNG as `<asset-name>@3x.png`.
-3. Generate `<asset-name>@2x.png` (downscale by 2/3) and `<asset-name>@1x.png` (downscale by 1/3) using bundled `scripts/scale_ios_assets.py`.
+3. Generate `<asset-name>@2x.png` and `<asset-name>@1x.png` using bundled `scripts/scale_ios_assets.py`. The script enforces that all three scales are exact integer point-equivalents (size_2x = 2 × size_1x, size_3x = 3 × size_1x); if the source dims aren't divisible by 6 it pads with transparency up to the next multiple of 6 and rewrites the @3x file at the padded size. This is required for crisp Asset Catalog rendering — non-aligned scales force the iOS renderer to interpolate at runtime.
 4. Write/update `Contents.json` with the standard 3-scale block. See `references/ios-contents-json.md` for the exact shape.
 
 For web targets, drop the transparent PNG straight into the path the user gave; skip Contents.json.

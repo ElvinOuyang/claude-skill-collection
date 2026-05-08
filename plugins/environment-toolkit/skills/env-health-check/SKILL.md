@@ -37,6 +37,40 @@ For every section, classify findings as:
 
 At the end, produce a single **Punch List** (template at the bottom of this file) showing what was auto-fixed and what needs the user.
 
+### Portable timeout helper (set up once, reuse everywhere)
+
+Default macOS does **not** ship GNU `timeout`. Bare `timeout 3 docker info` fails with "command not found" on a vanilla Mac. Before running any probe, set up a `run_with_timeout` shell function that picks the best available implementation. Reuse this for every external probe in the sections below.
+
+```bash
+# Pick the best available timeout implementation. Order:
+#   1. GNU coreutils `timeout`            (Linux default, also present on Macs that have it)
+#   2. `gtimeout` from `brew install coreutils` (most common macOS install)
+#   3. Pure-shell fallback using a background PID + kill
+run_with_timeout() {
+  local secs=$1; shift
+  if command -v timeout >/dev/null 2>&1; then
+    timeout "${secs}" "$@"
+  elif command -v gtimeout >/dev/null 2>&1; then
+    gtimeout "${secs}" "$@"
+  else
+    # Shell-native fallback: run the command in the background, sleep, then SIGTERM if still alive.
+    "$@" &
+    local cmd_pid=$!
+    ( sleep "${secs}" && kill -TERM "${cmd_pid}" 2>/dev/null && sleep 1 && kill -KILL "${cmd_pid}" 2>/dev/null ) &
+    local watchdog_pid=$!
+    wait "${cmd_pid}" 2>/dev/null
+    local rc=$?
+    kill -TERM "${watchdog_pid}" 2>/dev/null
+    wait "${watchdog_pid}" 2>/dev/null
+    return $rc
+  fi
+}
+```
+
+Why three implementations: many users run the default macOS shell with no Homebrew coreutils, so `timeout` is missing entirely. We don't want the health check itself to error out before it diagnoses anything. The pure-shell fallback works on bash 3.2 (macOS default) and zsh.
+
+If the helper falls through to the shell fallback, briefly note that in the punch list -- on a wedged daemon the fallback's `kill -TERM` may not free a stuck FS call as cleanly as GNU `timeout`'s SIGKILL escalation, so flaky probes are slightly more likely.
+
 ### 1. Git health
 
 Run from the current repo if there is one; otherwise note "no repo, skipping git checks".
@@ -45,8 +79,23 @@ Run from the current repo if there is one; otherwise note "no repo, skipping git
 # Inside the repo
 REPO=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not a git repo"; }
 
-# Hung git processes (a real recurring issue)
-ps -eo pid,etime,command | grep -E '[g]it ' | awk '$2 ~ /[0-9]+:[0-9]+:[0-9]+/ || ($2 ~ /^[0-9]+:[0-9]+$/ && $2 > "05:00") { print }'
+# Hung git processes (a real recurring issue).
+# `ps -o etime` formats are: "MM:SS", "HH:MM:SS", or "D-HH:MM:SS". String compare
+# on hh:mm:ss breaks at hour boundaries (e.g. "10:00" < "5:00" lexically), so we
+# parse to seconds first, then threshold at 5 minutes (300s).
+ps -eo pid,etime,command | grep -E '[g]it ' | awk '
+  {
+    et = $2
+    secs = 0
+    n = split(et, a, "-")            # split off optional days
+    if (n == 2) { secs += a[1]*86400; et = a[2] } else { et = a[1] }
+    n = split(et, b, ":")
+    if (n == 3)      { secs += b[1]*3600 + b[2]*60 + b[3] }
+    else if (n == 2) { secs += b[1]*60 + b[2] }
+    else             { secs += b[1] }
+    if (secs >= 300) { print }
+  }
+'
 
 # Lock files left behind by crashed processes
 ls -la "$REPO/.git"/{index.lock,HEAD.lock,config.lock,refs/heads/**/*.lock} 2>/dev/null
@@ -55,15 +104,19 @@ ls -la "$REPO/.git"/{index.lock,HEAD.lock,config.lock,refs/heads/**/*.lock} 2>/d
 git worktree list
 git worktree prune --dry-run
 
-# Repo integrity (cheap subset; full fsck is slow)
-git fsck --no-dangling --no-reflogs 2>&1 | head -50
+# Repo integrity (cheap subset; full fsck is slow). Wrap in the timeout helper:
+# fsck on a corrupt repo can spin for a long time.
+run_with_timeout 15 git fsck --no-dangling --no-reflogs 2>&1 | head -50
 
-# Branch / remote reachability
+# Branch / remote reachability. Network probes MUST be wrapped -- DNS hangs,
+# auth prompts, dead VPNs all freeze git for minutes otherwise.
 git remote -v
-git ls-remote --heads origin >/dev/null 2>&1 && echo "remote: reachable" || echo "remote: UNREACHABLE"
+run_with_timeout 8 git ls-remote --heads origin >/dev/null 2>&1 \
+  && echo "remote: reachable" \
+  || echo "remote: UNREACHABLE (or timed out after 8s)"
 
 # Local vs remote drift on the current branch
-git fetch --dry-run origin 2>&1 | head
+run_with_timeout 8 git fetch --dry-run origin 2>&1 | head
 ```
 
 **Auto-fix safely:**
@@ -81,17 +134,18 @@ Docker probes hang when the daemon is wedged. Use timeouts religiously.
 
 ```bash
 # Socket reachable? (don't let docker ps hang the whole skill)
-timeout 3 docker info >/dev/null 2>&1 && echo "docker: ok" || echo "docker: NOT RESPONDING"
+# Use the portable helper -- bare `timeout` is missing on default macOS.
+run_with_timeout 3 docker info >/dev/null 2>&1 && echo "docker: ok" || echo "docker: NOT RESPONDING"
 
 # Daemon process
 pgrep -lf "Docker Desktop|dockerd|com.docker" | head
 
 # Hung containers (only if daemon is responsive)
-timeout 5 docker ps --filter status=exited --filter status=dead --format '{{.ID}} {{.Names}} {{.Status}}' 2>/dev/null
-timeout 5 docker ps --format '{{.ID}} {{.Names}} {{.Status}}' 2>/dev/null | grep -iE 'unhealthy|restarting'
+run_with_timeout 5 docker ps --filter status=exited --filter status=dead --format '{{.ID}} {{.Names}} {{.Status}}' 2>/dev/null
+run_with_timeout 5 docker ps --format '{{.ID}} {{.Names}} {{.Status}}' 2>/dev/null | grep -iE 'unhealthy|restarting'
 
 # Disk usage in docker
-timeout 5 docker system df 2>/dev/null
+run_with_timeout 5 docker system df 2>/dev/null
 ```
 
 **Auto-fix safely:**
@@ -220,6 +274,6 @@ If a section ran clean, list it under "Skipped / not applicable" with reason "no
 
 - **Never kill processes without confirmation.** Hung git or docker processes might be the user's foreground work.
 - **Never `rm -rf` caches automatically.** Always recommend, never delete cache directories. Lockfiles and stale worktree entries are the only auto-deletes.
-- **Use timeouts on every external probe.** A `docker ps` that hangs for 30s defeats the point of a health check.
+- **Use timeouts on every external probe** via the `run_with_timeout` helper defined at the top of the workflow. Bare `timeout` is missing on default macOS. Every command that touches a daemon, a remote, or the network -- `docker info`, `docker ps`, `git ls-remote`, `git fetch`, `git fsck`, simulator boot probes -- must go through the helper. A `docker ps` that hangs for 30s defeats the point of a health check.
 - **Surface everything once.** Don't fix half and stop. The user wants the full picture so they can triage themselves.
 - **Be explicit about the meta-work framing** so it's clear why this skill is operating outside the usual feature-scope discipline.

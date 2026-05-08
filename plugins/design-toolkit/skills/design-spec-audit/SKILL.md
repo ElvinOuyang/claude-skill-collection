@@ -30,8 +30,10 @@ The whole point of this skill is to **drive the app**, not just grep the source.
 
 This is a recurring user preference, so be unambiguous:
 
-- **iOS: use the AXe CLI.** Not the computer-use MCP, not coordinate taps, not screenshots-and-eyeball. AXe gives label-based interaction and structured accessibility-tree dumps that the audit can measure against. See `references/axe-ios.md` for the commands the audit uses.
+- **iOS: use the AXe CLI.** Not the computer-use MCP, not coordinate taps, not screenshots-and-eyeball. AXe gives label-based interaction and structured accessibility-tree dumps that the audit can measure against. **The authoritative AXe reference for command shapes, flags, and behavior is `plugins/ios-dev-toolkit/skills/axe/SKILL.md` — defer to it.** This skill's `references/axe-ios.md` is a cheatsheet for how the audit *uses* AXe; it does not redefine AXe's contract.
 - **Web: use Playwright** (the MCP if available, otherwise scripted Playwright). Playwright exposes `getComputedStyle` for any element, which is exactly what the audit needs.
+
+Every AXe interaction command requires `--udid <UDID>`. Run `axe list-simulators` first, pick the simulator running the build under audit, and reuse that UDID for the rest of the audit. Commands without `--udid` will not work for simulator interaction.
 
 If the user is on iOS and AXe isn't installed, stop and ask them to install it before proceeding. Don't fall back to coordinate taps — past sessions have shown this is the user's biggest pet peeve.
 
@@ -58,12 +60,12 @@ Save the rule list to `.audit/rules.json` so the user can review and edit before
 
 For each screen on the list:
 
-1. **Navigate** (AXe `tap` for iOS, Playwright `click` for web — never coordinates).
-2. **Screenshot** — full screen and per-component crops for the report.
+1. **Navigate** — iOS: `axe tap --label "<text>" --udid "$UDID"` or `axe tap --id "<identifier>" --udid "$UDID"`. Web: Playwright `click`. Never coordinates.
+2. **Screenshot** — iOS: `axe screenshot --udid "$UDID" --output <path>`. Web: Playwright. Capture full screen and per-component crops for the report.
 3. **Capture state**:
-   - **iOS**: AXe `describe-ui` returns the accessibility tree with frames. For colors, use the simulator's color-eyedropper helper or read from snapshot bytes at known tree-node centers. For typography, the AX node carries font info.
+   - **iOS**: `axe describe-ui --udid "$UDID"` returns the accessibility tree with **frames, labels, and identifiers** — that is the source of truth for *layout* and *which element is where*. It does **not** return font family/size/weight or computed colors. For color spot-checks, use the bundled `scripts/sample_pixel.py` helper to read a pixel from the screenshot at the element's center frame coordinate. For typography, fall back to source-of-truth code review or visual confirmation, and label the finding accordingly — do not claim AXe verified it. See `references/axe-ios.md` for the full set of gaps and workable paths.
    - **Web**: for each element matching the spec's selectors, capture `getComputedStyle` (color, background-color, padding, margin, font-family, font-size, font-weight, line-height, border-radius, transition).
-4. **Diff** captured values against the rules. Report every divergence — even small ones; the user decides what to fix based on severity.
+4. **Diff** captured values against the rules. Report every divergence — even small ones; the user decides what to fix based on severity. Tag each finding with how it was verified: `runtime-axe-frame`, `runtime-pixel-sample`, `runtime-computed-style`, `static-source`, or `visual-manual`. The provenance matters because pixel-sampling and source review are weaker signals than `getComputedStyle`.
 
 See `references/axe-ios.md` and `references/playwright-web.md` for the exact commands.
 

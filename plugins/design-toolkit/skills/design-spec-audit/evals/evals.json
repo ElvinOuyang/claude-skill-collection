@@ -1,0 +1,49 @@
+{
+  "skill_name": "design-spec-audit",
+  "evals": [
+    {
+      "id": 1,
+      "name": "audit-running-app-against-design-md",
+      "prompt": "audit the running app against DESIGN.md",
+      "expected_output": "Plan describes using the AXe CLI on iOS, every AXe command example uses --udid, defers to plugins/ios-dev-toolkit/skills/axe/, makes no claim that describe-ui returns font information, and references the bundled sample_pixel.py helper or is explicit that color/font checks are gaps.",
+      "expectations": [
+        "response contains --udid",
+        "response contains plugins/ios-dev-toolkit/skills/axe",
+        "response contains list-simulators",
+        "response contains describe-ui",
+        "response does not contain tap-by-id",
+        "response does not contain describe-ui carries font",
+        "response does not contain accessibility tree carries font",
+        "response does not contain AX node carries font",
+        "response does not contain color-eyedropper"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "design-spec-audit-on-ios-simulator",
+      "prompt": "design spec audit on the iOS simulator",
+      "expected_output": "Plan that picks a simulator UDID first, uses axe tap --label/--id with --udid, uses axe describe-ui --udid for layout, and is honest that font/color checks have limitations.",
+      "expectations": [
+        "response contains --udid",
+        "response contains list-simulators",
+        "response contains plugins/ios-dev-toolkit/skills/axe",
+        "response does not contain tap-by-id",
+        "response does not contain describe-ui carries font",
+        "response does not contain AX node carries font"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "verify-implementation-matches-tokens",
+      "prompt": "verify the implementation matches our design tokens",
+      "expected_output": "Plan that diffs runtime values against tokens, uses --udid on every AXe interaction, references sample_pixel.py for color spot-checks (or is explicit about gaps), and does not claim AXe returns typography or color directly.",
+      "expectations": [
+        "response contains --udid",
+        "response contains plugins/ios-dev-toolkit/skills/axe",
+        "response contains sample_pixel",
+        "response does not contain describe-ui carries font",
+        "response does not contain tap-by-id"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "adversarial-review-cycle",
+  "evals": [
+    {
+      "id": "E1",
+      "prompt": "I just finished a refactor of the auth flow. Do an adversarial review on it before I ship -- try to break it.",
+      "expected_skill": "adversarial-review-cycle",
+      "assertions": [
+        {
+          "id": "A1",
+          "description": "The skill instructs the reviewer subagent to receive the FULL diff (or read changed files end-to-end), not a prose summary.",
+          "check": "SKILL.md body explicitly forbids summary-only review and requires full diff / file reads in Phase 1 setup and Phase 2 prompt template."
+        },
+        {
+          "id": "A2",
+          "description": "The skill RECOMMENDS opus-class model but does not HARD-CODE it as required.",
+          "check": "SKILL.md uses 'recommended', 'prefer', or 'recommendation, not a hard requirement' language around model choice; does not state opus is mandatory."
+        },
+        {
+          "id": "A3",
+          "description": "The description includes explicit 'do not trigger for routine code review' guidance and routes to code-review:code-review.",
+          "check": "Frontmatter description contains a 'Do NOT trigger' clause referencing routine code review and pointing to code-review:code-review."
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "prompt": "Red-team this new harness Stop hook -- I want a hardening pass before I commit it.",
+      "expected_skill": "adversarial-review-cycle",
+      "assertions": [
+        {
+          "id": "A1",
+          "description": "Reviewer subagent prompt template instructs it to read the full diff and tests, not a summary.",
+          "check": "Phase 2 prompt template Context block says 'read the full diff' and 'do NOT rely on a summary'."
+        },
+        {
+          "id": "A2",
+          "description": "Skill notes the agent-model gate is environment-dependent, not assumed to exist.",
+          "check": "Phase 2 says 'if your environment has agent-model gating hooks' (conditional) rather than asserting the user's CLAUDE.md hook exists."
+        },
+        {
+          "id": "A3",
+          "description": "Description disambiguates from verification-before-completion and brainstorming.",
+          "check": "Frontmatter description names superpowers:verification-before-completion and superpowers:brainstorming as alternatives that should be used instead in non-adversarial cases."
+        }
+      ]
+    }
+  ]
+}

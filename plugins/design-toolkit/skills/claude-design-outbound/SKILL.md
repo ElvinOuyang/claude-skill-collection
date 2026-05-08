@@ -56,9 +56,18 @@ The designer's input is a single folder they can drag into Claude Design.
 
 ### Step 1: Capture screens
 
-Drive the running app the same way `design-spec-audit` does:
+Drive the running app the same way `design-spec-audit` does. **The authoritative AXe reference is `plugins/ios-dev-toolkit/skills/axe/SKILL.md` — defer to it for command shapes and flags.**
 
-- **iOS** — AXe CLI (`axe screenshot`, `axe describe-ui`). Not coordinate taps, not computer-use MCP.
+- **iOS** — AXe CLI. Every interaction command requires `--udid <UDID>`; run `axe list-simulators` first and pick the simulator running the build under capture, then reuse that UDID:
+  ```bash
+  axe list-simulators
+  UDID=<picked-udid>
+  axe describe-ui --udid "$UDID" > screens/<screen>.tree.json
+  axe screenshot --udid "$UDID" --output screens/<screen>.png
+  axe tap --label "<text>" --udid "$UDID"     # navigation, by accessibility label
+  axe tap --id "<identifier>" --udid "$UDID"  # navigation, by accessibility identifier
+  ```
+  Not coordinate taps, not computer-use MCP. Note: `axe describe-ui` returns frames/labels/identifiers — **not** font or color information. For runtime token capture (Step 3) read colors via the screenshot pixel-sampling helper at `../design-spec-audit/scripts/sample_pixel.py`, and read typography from source / theme files (label findings as `static-source` rather than runtime-verified).
 - **Web** — Playwright. Capture full-page shots and per-component crops.
 
 Walk the user-facing top 10–20 screens (don't try to capture everything). For each:
@@ -84,6 +93,8 @@ Read tokens from the codebase **and** from the running app. Both because:
 
 - The codebase value is the intent.
 - The runtime value is what shipped (and may differ if a fallback resolved unexpectedly).
+
+On iOS, runtime capture has known gaps: AXe's `describe-ui` does not expose computed colors or typography. Use `sample_pixel.py` against `axe screenshot` output for spot-checking colors at known frame coordinates, and fall back to source-of-truth review for typography. Mark each token entry with how `runtime` was obtained (`pixel-sample`, `static-source`, etc.) so the designer knows which values are runtime-confirmed vs inferred.
 
 For each token write `tokens/<category>.json`:
 

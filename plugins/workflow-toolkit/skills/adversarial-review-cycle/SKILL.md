@@ -1,7 +1,7 @@
 ---
 name: adversarial-review-cycle
 description: >
-  Run a structured adversarial review loop before merging or shipping. Dispatch an opus-powered review subagent with explicit "try to break this" framing, classify findings P0/P1/P2/P3, fix the P0/P1s, then run a second pass from a different angle (security, correctness, UX, perf) and only mark complete when both passes return clean. Use this skill whenever the user signals they want a hardening pass before shipping -- phrases like "adversarial review", "second opinion", "try to break this", "review before merge", "double-check before PR", "before I ship", "hardening pass", "can you poke holes", "stress test this", "what would you attack", "is this actually done", "do an adversarial pass", or any time the user has just finished implementation and wants verification beyond their own gut. Trigger even when the user doesn't say "adversarial" explicitly -- the cue is "I think it's done, prove me wrong". This pattern correlates strongly with shipping clean (the v1.9.1 hotfix, video-use audit, and harness scaffold all used 2 rounds and shipped clean). Do not trigger for early-stage design review (use brainstorming) or for lightweight code review (use the standard code-review skill).
+  Run a structured ADVERSARIAL ("try to break it") review loop as a hardening pass before shipping. Dispatch a fresh review subagent with explicit "attack this, do not validate it" framing, require it to read the FULL diff and tests (no summaries), classify findings P0/P1/P2/P3, fix the P0/P1s, then run a second pass from a different angle (security, correctness, UX, perf) and only mark complete when both passes return clean. Use this skill ONLY when the user signals an explicitly adversarial framing -- phrases like "adversarial review", "try to break this", "poke holes", "stress test this", "what would you attack", "hardening pass", "prove me wrong", "do an adversarial pass", "red-team this", "find what's wrong with this", or "I think it's done, attack it". The cue is hostile-stance review, not friendly verification. **Do NOT trigger for routine code review** (use `code-review:code-review`), **do NOT trigger for "review before merge" or "double-check before PR" or "is this done"** without the explicit break-it framing -- those are ordinary code review and belong in the standard code-review skill. **Do NOT trigger for early-stage design review** (use `superpowers:brainstorming`). **Do NOT trigger for lightweight verification** (use `superpowers:verification-before-completion` or `superpowers:requesting-code-review`). The differentiator is adversarial intent: the user wants the work attacked, not validated.
 ---
 
 # Adversarial Review Cycle
@@ -31,23 +31,27 @@ If the work is small (one-line fix, doc edit), one round is enough; ask the user
 
 Before dispatching, gather:
 
-1. **What changed.** `git diff <base>..HEAD`, list of files, summary of intent.
+1. **What changed.** The **full** `git diff <base>..HEAD` and the list of changed files. The reviewer subagent must receive the actual diff (or be instructed to read each changed file in full) -- **never a prose summary**. Adversarial review depends on reading the code that exists, not the code the implementer thinks they wrote; summaries launder the same blind spots that produced the bugs in the first place.
 2. **What "done" means here.** The spec, PRD section, ticket, or the user's stated goal. Without this, the reviewer has no yardstick.
-3. **Known risks.** Anything the implementer was nervous about during the build. Surface these to the reviewer explicitly -- they're high-yield attack surfaces.
-4. **Out-of-scope.** Things the reviewer should not flag (e.g., "we know logging is sparse; that's a follow-up").
+3. **Tests.** Paths to the test files covering this change. The reviewer must read them; tests reveal what the implementer believed would matter and, by omission, what they didn't think to check.
+4. **Known risks.** Anything the implementer was nervous about during the build. Surface these to the reviewer explicitly -- they're high-yield attack surfaces.
+5. **Out-of-scope.** Things the reviewer should not flag (e.g., "we know logging is sparse; that's a follow-up").
 
 Pick the **Round 1 angle**. Default is correctness + completeness against the spec. If the work has a clear primary risk (security-sensitive, perf-sensitive, UX-sensitive), lead with that.
 
 ## Phase 2: Round 1 -- broad attack
 
-Dispatch a subagent with `model: "opus"` (this is review work; opus is the right tool, and the parent CLAUDE.md hook expects the keyword "review" or "adversarial" in the prompt). Use a prompt structured like this:
+Dispatch a fresh review subagent. **Recommended: a strong reasoning model** (e.g. opus-class) -- adversarial review is reasoning-heavy and weaker models miss subtle attack vectors. If your environment has agent-model gating hooks that trigger on keywords, ensure the dispatch prompt includes "review" or "adversarial" so the appropriate model is selected; otherwise pass `model: "opus"` (or your project's equivalent strong model) explicitly. **This is a recommendation, not a hard requirement** -- some projects standardize on a single model, and that's fine; the framing and full-diff input matter more than the exact model.
+
+Use a prompt structured like this:
 
 ```
 You are doing an adversarial review of completed work. Your job is to try to break it -- not to validate it, not to be agreeable, not to soften findings. Be specific, be technical, be ruthless.
 
 Context:
 - Goal: <what done means>
-- Changes: <diff summary or paths>
+- Changes: read the full diff at <path or inline diff> and read each changed file end-to-end. Do NOT rely on a summary; the summary is what missed the bug.
+- Tests: read <test paths> in full. Note what the tests cover AND what they conspicuously do not.
 - Known risks the implementer flagged: <list>
 - Out of scope: <list>
 - Review angle for this pass: <correctness / security / UX / perf>
@@ -84,7 +88,7 @@ If any fix is non-trivial, treat it as a mini-implementation and follow whatever
 
 ## Phase 5: Round 2 -- different angle
 
-Dispatch a **second** subagent (also `model: "opus"`), with an explicitly different review angle from Round 1. The angle change is the whole point -- repeating the Round 1 angle is mostly wasted because the obvious issues there have been fixed.
+Dispatch a **second** subagent (same model recommendation as Round 1 -- a strong reasoning model; see Phase 2 for the model-gate caveat), with an explicitly different review angle from Round 1. The angle change is the whole point -- repeating the Round 1 angle is mostly wasted because the obvious issues there have been fixed. The Round 2 reviewer must also read the full diff and tests directly -- no summaries, including no summary of Round 1's findings beyond "what was fixed / accepted".
 
 Angle rotation guide:
 
@@ -135,7 +139,8 @@ File location is project-dependent -- common spots are `docs/reviews/`, the PR d
 ## Conservative defaults
 
 - **Two rounds is the floor for non-trivial work**, not the ceiling. Three rounds is fine. One round is fine for tiny changes.
-- **Use `model: "opus"`** for review subagents. Reviewing is reasoning-heavy and the hook in the user's CLAUDE.md expects opus + a review keyword in the dispatch.
+- **Prefer a strong reasoning model (opus-class) for review subagents.** Adversarial review is reasoning-heavy. This is a recommendation, not a hard rule -- if your project standardizes on a different model, use that. If your environment has agent-model gating hooks keyed on words like "review" or "adversarial", make sure the dispatch prompt uses that vocabulary so the gate routes correctly; if no such gate exists, just pick the strongest model your project supports.
+- **Reviewer reads the full diff and tests, never a summary.** A summary of the change reflects the implementer's mental model, which is exactly what the review is meant to challenge. Pass paths or inline diff, and instruct the reviewer to read end-to-end.
 - **Different angle every round.** Repeating the same angle wastes a round.
 - **Do not let the implementer be the reviewer.** Even if "the implementer" is Claude in the same session, dispatch a fresh subagent so the review has a real cold-start perspective.
 - **Do not soften findings to make the implementer feel better.** A pleasing review is a useless review.
