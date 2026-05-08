@@ -1,5 +1,6 @@
 # Eval workspaces (local testing artifacts)
 *-workspace/
+**/skills/*/workspace/
 evals/results/
 
 # OS

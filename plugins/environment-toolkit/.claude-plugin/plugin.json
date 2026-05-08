@@ -1,0 +1,9 @@
+{
+  "name": "environment-toolkit",
+  "version": "1.0.0",
+  "description": "Cross-project environment maintenance: env health diagnostics (git/docker/Xcode/MCP) and MCP pruning by token cost and failure rate",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

@@ -1,0 +1,47 @@
+{
+  "skill_name": "claude-design-outbound",
+  "evals": [
+    {
+      "id": 1,
+      "name": "export-ios-implementation-to-claude-design",
+      "prompt": "export the current iOS implementation to Claude Design",
+      "expected_output": "Plan describes packaging the running iOS app as an outbound design pack, captures screens via axe screenshot/describe-ui with --udid on every command, defers to plugins/ios-dev-toolkit/skills/axe/, and does not claim AXe returns font information.",
+      "expectations": [
+        "response contains --udid",
+        "response contains list-simulators",
+        "response contains plugins/ios-dev-toolkit/skills/axe",
+        "response contains axe screenshot",
+        "response contains describe-ui",
+        "response does not contain tap-by-id",
+        "response does not contain describe-ui carries font",
+        "response does not contain AX node carries font"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "snapshot-running-app-for-designer",
+      "prompt": "snapshot the running app for the designer to iterate",
+      "expected_output": "Plan that walks top screens of the running app, captures screenshots and the accessibility tree on iOS using axe with --udid, and is explicit about typography/color gaps.",
+      "expectations": [
+        "response contains --udid",
+        "response contains plugins/ios-dev-toolkit/skills/axe",
+        "response contains axe screenshot",
+        "response does not contain tap-by-id",
+        "response does not contain describe-ui carries font"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "package-screenshots-and-tokens",
+      "prompt": "package screenshots and tokens for Claude Design",
+      "expected_output": "Plan covers screens (axe screenshot --udid), tokens (intent vs runtime, with provenance), and is honest that color/font runtime values come from sample_pixel.py or static source review rather than AXe directly.",
+      "expectations": [
+        "response contains --udid",
+        "response contains plugins/ios-dev-toolkit/skills/axe",
+        "response contains sample_pixel",
+        "response does not contain describe-ui carries font",
+        "response does not contain tap-by-id"
+      ]
+    }
+  ]
+}

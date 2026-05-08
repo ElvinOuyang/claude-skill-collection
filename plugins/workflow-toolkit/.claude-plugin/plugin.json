@@ -1,0 +1,9 @@
+{
+  "name": "workflow-toolkit",
+  "version": "1.0.0",
+  "description": "Repeatable engineering rituals: post-merge sync, live runbook walkthroughs for external/multi-step processes, and adversarial review cycles before merge",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Moodboard — {{project}}</title>
+  <style>
+    body { margin: 0; padding: 24px; font-family: -apple-system, system-ui, sans-serif; background: #111; color: #eee; }
+    h1 { font-weight: 500; margin: 0 0 8px; }
+    p.meta { margin: 0 0 24px; color: #888; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .tile { background: #1a1a1a; border-radius: 8px; overflow: hidden; }
+    .tile img { width: 100%; height: 240px; object-fit: cover; display: block; }
+    .tile .meta { padding: 12px; font-size: 12px; line-height: 1.4; }
+    .tile .id { display: inline-block; background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 6px; }
+    .tile .src { color: #888; }
+    .tile .desc { color: #ccc; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Moodboard — {{project}}</h1>
+  <p class="meta">{{count}} references · gathered {{date}} · pick 3–5 favorites by tile number</p>
+  <div class="grid">
+    <!-- Repeat one .tile per reference. Number them so the user can say "tiles 3, 7, 12". -->
+    <div class="tile">
+      <img src="{{path}}" alt="{{descriptor}}" />
+      <div class="meta">
+        <span class="id">{{n}}</span><span class="src">{{source}}</span>
+        <div class="desc">{{descriptor}}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

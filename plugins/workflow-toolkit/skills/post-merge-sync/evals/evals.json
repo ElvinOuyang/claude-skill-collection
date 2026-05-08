@@ -1,0 +1,80 @@
+{
+  "skill_name": "post-merge-sync",
+  "evals": [
+    {
+      "id": 1,
+      "name": "stash-on-feature-branch-with-wip",
+      "prompt": "I just merged the OA signed PR into master. I'm still on the feature branch and I have a couple of uncommitted edits in src/auth.ts that are actually for my *next* branch. Walk me through the post-merge cleanup -- I'll run the commands myself but tell me exactly what to run and why. Treat the repo at /tmp/post-merge-sync-fixture-1 as the working repo; describe commands and use read-only inspection (git status, git log, gh pr view) to verify state, but do not actually mutate the repo.",
+      "expected_output": "Step-by-step plan that stashes WIP with a branch-tagged message, fast-forwards trunk, and restores the stash on a NEW branch (or back on the feature branch) -- never on trunk itself. Plus a punch list at the end.",
+      "assertions": [
+        {
+          "id": "no-pop-on-trunk",
+          "text": "The plan never instructs `git stash pop` while HEAD is on trunk (master/main). Either it pops on the original feature branch, or it creates a new branch first and pops there, or it leaves the stash for the user to pop manually."
+        },
+        {
+          "id": "explicit-branch-check",
+          "text": "Before any stash pop, the plan explicitly states or shows verifying the current branch (e.g., references `git branch --show-current`, names the branch the pop will land on, or otherwise demonstrates the pop target is intentional)."
+        },
+        {
+          "id": "tagged-stash-message",
+          "text": "The stash push command uses `-m` with a message that identifies the source branch (e.g., includes the branch name or 'WIP on <branch>')."
+        },
+        {
+          "id": "punch-list-produced",
+          "text": "Output ends with a punch list / follow-up summary covering at least: living docs to update, rebasable open PRs, or follow-ups mentioned in the merged PR. (Empty sections may be omitted but the structure must be present.)"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "squash-merged-branch-with-local-only-commits",
+      "prompt": "Hey, I just merged my harness-fix PR -- it was a squash merge on GitHub. I think I have some local commits on the branch that didn't end up in the squash (some debug prints I made and never pushed). Can you sync me up and clean the branch? Working repo is /tmp/post-merge-sync-fixture-2; describe the commands you'd run but only verify state via read-only git/gh commands (no mutations).",
+      "expected_output": "Plan that detects local-only commits via `git log origin/<trunk>..<branch>`, shows them to the user, and refuses to run `git branch -D` without explicit opt-in. Should NOT silently destroy commits.",
+      "assertions": [
+        {
+          "id": "checks-unmerged-commits",
+          "text": "The plan runs (or instructs running) `git log origin/<trunk>..<branch>` (or an equivalent range like `<trunk>..<branch>`) to enumerate local-only commits BEFORE any branch deletion."
+        },
+        {
+          "id": "warns-on-force-delete",
+          "text": "The plan explicitly warns that `git branch -D` will make the local-only commits unreachable, and requires explicit user confirmation before running it. It does not present `-D` as automatically safe just because the PR merged."
+        },
+        {
+          "id": "tries-safe-delete-first",
+          "text": "The plan attempts `git branch -d` (lowercase, safe) before considering `-D`, or explicitly explains why `-d` won't work for squash-merges."
+        },
+        {
+          "id": "uses-merge-commit-range",
+          "text": "When scanning for follow-ups/TODOs, the plan uses an unambiguous range tied to the actual merge commit (e.g., `<merge-parent>..<merge-sha>` or the SHA from `gh pr view --json mergeCommit`), not `master..HEAD~1` or other guesses."
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "user-on-trunk-already-with-clean-tree",
+      "prompt": "anything else left on this branch? I think I already merged the workflow-toolkit PR a few minutes ago. Not sure what state I'm in. Repo: /tmp/post-merge-sync-fixture-3. Just inspect read-only and tell me the plan; don't run mutations.",
+      "expected_output": "Diagnosis-first plan: figure out the current branch (might be trunk already, might be the feature branch, might be detached), then proceed accordingly. Should produce a punch list of follow-ups even if the sync itself is a no-op.",
+      "assertions": [
+        {
+          "id": "diagnoses-before-acting",
+          "text": "The plan starts with a Phase 1-style diagnosis (running git status, git branch --show-current, git stash list, gh pr list) before proposing any state-changing command."
+        },
+        {
+          "id": "detects-trunk-name",
+          "text": "The plan detects or asks about the trunk name rather than hardcoding `master` -- e.g., references `git symbolic-ref refs/remotes/origin/HEAD`, `gh repo view --json defaultBranchRef`, or explicitly says 'substitute main/master as appropriate'."
+        },
+        {
+          "id": "punch-list-even-on-noop",
+          "text": "Even when the sync itself is a no-op (already on trunk, clean tree), the plan still produces a follow-up punch list scanning living docs, rebasable PRs, and TODOs from the merged PR."
+        },
+        {
+          "id": "no-blind-mutations",
+          "text": "The plan does not propose force-pushes, force-deletes (`-D`), or `git reset --hard` as part of the standard ritual. Conservative defaults are honored."
+        }
+      ],
+      "files": []
+    }
+  ]
+}

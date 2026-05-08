@@ -1,0 +1,9 @@
+{
+  "name": "design-toolkit",
+  "version": "1.0.0",
+  "description": "Design suite: visual ideation moodboards, browser-driven illustration asset pipeline, design-spec audits against running apps, and Claude Design handoff (inbound + outbound)",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

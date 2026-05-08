@@ -1,0 +1,36 @@
+{
+  "skill": "mcp-prune",
+  "description": "Falsifiable assertions verifying the safe-write protocol: backup-before-mutate, atomic temp+rename, parse-validate, rollback, and record-before-mutate ordering.",
+  "tests": [
+    {
+      "id": "audit-and-disable-failing",
+      "prompt": "Help me uninstall some of the failing mcps please. The fixture config is at plugins/environment-toolkit/skills/mcp-prune/mcp-prune-workspace/fixture-claude.json -- treat it as if it were ~/.claude.json. The 'finance' and 'legal' servers are failing on startup. Walk me through the audit and the disable plan in concrete steps, including the EXACT shell/python you would run against the fixture to disable those two. Do not actually mutate the fixture; describe the commands and the resulting on-disk state. I want to see every safety step you would take.",
+      "assertions": [
+        "Output describes creating a timestamped backup of ~/.claude.json (e.g. .bak.YYYYMMDDHHMMSS or similar timestamp suffix) BEFORE any mutation.",
+        "Output describes writing the new config to a temporary file in the same directory and then atomically renaming it (os.replace, mv, or rename) over the destination -- not writing in place.",
+        "Output describes re-reading and JSON-parsing the file AFTER the write to validate it succeeded.",
+        "Output describes that the reversible record / log entry is created BEFORE the live config is mutated, not after.",
+        "Output describes a rollback path (restore from the timestamped backup) if post-write validation fails."
+      ]
+    },
+    {
+      "id": "crash-mid-write-recovery",
+      "prompt": "I'm worried about what happens if my laptop dies in the middle of an mcp-prune disable. Use the mcp-prune skill at plugins/environment-toolkit/skills/mcp-prune/. Walk me through exactly what state the user's ~/.claude.json and the reversible log would be in if a crash happens (a) between starting the disable plan and the first file write, and (b) during the write of the new config. Reference the specific safety mechanisms in the skill that protect against each crash window.",
+      "assertions": [
+        "Output explicitly references that a timestamped backup file exists before mutation, so a crash during write can be recovered from it.",
+        "Output explicitly references that writes go to a temp file plus atomic rename, so an interrupted write does not leave ~/.claude.json truncated or empty.",
+        "Output explicitly states the reversible record / mcp-prune log is written BEFORE the live config mutation, so a crash mid-write still leaves a recovery path on disk.",
+        "Output does NOT recommend opening ~/.claude.json directly with mode 'w' / open(path, 'w') as the write strategy."
+      ]
+    },
+    {
+      "id": "host-semantics-skeptic",
+      "prompt": "I'm running a Claude Code fork and I'm not sure it actually reads disabledMcpServers back. Use the mcp-prune skill. Should I still go ahead and rely on disabledMcpServers? What does the skill tell me to do in this case, and how does that change the disable + reversible-record plan?",
+      "assertions": [
+        "Output states that disabledMcpServers semantics must be verified against the host before being relied on -- it is not guaranteed.",
+        "Output offers a fallback plan when the host does not honor disabledMcpServers: remove the entry from mcpServers and keep the full original entry in the reversible record so manual restore is possible.",
+        "Output still requires backup-before-mutate and atomic write even in the fallback plan."
+      ]
+    }
+  ]
+}

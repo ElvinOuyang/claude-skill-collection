@@ -1,0 +1,96 @@
+{
+  "skill": "adversarial-review-cycle",
+  "purpose": "Verify the description triggers ONLY for explicitly adversarial review framings, not for routine code review or general verification.",
+  "should_trigger": [
+    {
+      "id": "T1",
+      "query": "I think this hotfix is done. Do an adversarial review and try to break it before I ship.",
+      "rationale": "Explicit 'adversarial review' + 'try to break it'."
+    },
+    {
+      "id": "T2",
+      "query": "Run a hardening pass on this PR -- poke holes in it before I merge.",
+      "rationale": "'Hardening pass' + 'poke holes' is canonical adversarial framing."
+    },
+    {
+      "id": "T3",
+      "query": "Stress test this and tell me what would break in production.",
+      "rationale": "'Stress test' + 'what would break' is attack-stance."
+    },
+    {
+      "id": "T4",
+      "query": "Red-team this auth refactor before I ship it.",
+      "rationale": "'Red-team' is explicitly adversarial."
+    },
+    {
+      "id": "T5",
+      "query": "I think it's done. Prove me wrong.",
+      "rationale": "'Prove me wrong' is the canonical adversarial cue called out in the description."
+    },
+    {
+      "id": "T6",
+      "query": "What would an attacker do with this endpoint? Try to break it.",
+      "rationale": "'What would an attacker do' + 'try to break it'."
+    },
+    {
+      "id": "T7",
+      "query": "Do an adversarial pass on the new harness Stop hook before I commit.",
+      "rationale": "'Adversarial pass' is explicit."
+    },
+    {
+      "id": "T8",
+      "query": "Find what's wrong with this implementation -- attack it, don't validate it.",
+      "rationale": "'Attack it, don't validate it' is exact adversarial intent."
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "id": "N1",
+      "query": "Can you review this PR before I merge?",
+      "rationale": "Routine code review. Should route to code-review:code-review.",
+      "preferred_skill": "code-review:code-review"
+    },
+    {
+      "id": "N2",
+      "query": "Double-check this diff before I push it.",
+      "rationale": "Routine verification, no adversarial framing.",
+      "preferred_skill": "superpowers:requesting-code-review"
+    },
+    {
+      "id": "N3",
+      "query": "Is this actually done? Can you verify the tests pass and the spec is met?",
+      "rationale": "Verification before completion, not adversarial.",
+      "preferred_skill": "superpowers:verification-before-completion"
+    },
+    {
+      "id": "N4",
+      "query": "Help me brainstorm how this feature should work before I start coding.",
+      "rationale": "Early-stage design. Should route to brainstorming.",
+      "preferred_skill": "superpowers:brainstorming"
+    },
+    {
+      "id": "N5",
+      "query": "Review my code changes and give me feedback.",
+      "rationale": "Generic code review request, no adversarial intent.",
+      "preferred_skill": "code-review:code-review"
+    },
+    {
+      "id": "N6",
+      "query": "Look over this PR and let me know if it looks good.",
+      "rationale": "Friendly verification, not 'try to break it'.",
+      "preferred_skill": "code-review:code-review"
+    },
+    {
+      "id": "N7",
+      "query": "Can you validate this implementation matches the spec?",
+      "rationale": "Validation framing is the OPPOSITE of adversarial.",
+      "preferred_skill": "superpowers:verification-before-completion"
+    },
+    {
+      "id": "N8",
+      "query": "I'm receiving review feedback on my PR -- help me triage it.",
+      "rationale": "Receiving review, not running one.",
+      "preferred_skill": "superpowers:receiving-code-review"
+    }
+  ]
+}

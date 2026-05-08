@@ -1,0 +1,86 @@
+{
+  "skill_name": "live-runbook-walkthrough",
+  "description": "Trigger evals: 8 should-trigger queries (real-world irreversible workflows with runbooks), 8 should-not-trigger queries (ordinary engineering, code, design, hardware shopping).",
+  "evals": [
+    {
+      "id": 1,
+      "should_trigger": true,
+      "query": "ok i'm finally going to file the EIN for my LLC tonight, the runbook is at docs/runbooks/ein-application.md. Can you walk me through the IRS SS-4 online assistant field by field? I have my SSN and the NAICS code we picked written down."
+    },
+    {
+      "id": 2,
+      "should_trigger": true,
+      "query": "all three members are on a zoom and we're ready to sign the operating agreement. docs/business/operating-agreement-walkthrough.md is the runbook. hold my hand through the docusign flow and log the signed copy properly."
+    },
+    {
+      "id": 3,
+      "should_trigger": true,
+      "query": "appointment at chase tomorrow morning to open the business bank account. i have the EIN letter, the OA, and my license. runbook is in docs/runbooks/business-banking.md, can we walk through what i'll need to fill in and how to capture the artifacts after"
+    },
+    {
+      "id": 4,
+      "should_trigger": true,
+      "query": "first time pushing a build to testflight ever for this app, app store connect record doesn't exist yet. there's a runbook at docs/releases/first-testflight.md. walk me through provisioning + the asc record + the upload, this is the irreversible \"locks bundle id to team\" thing."
+    },
+    {
+      "id": 5,
+      "should_trigger": true,
+      "query": "BOI filing is due next week, fincen.gov walkthrough please. our beneficial owner data lives in docs/business/boi-filing.md as the runbook. need someone to narrate the form because i absolutely do not want to fat-finger an SSN on a federal filing."
+    },
+    {
+      "id": 6,
+      "should_trigger": true,
+      "query": "i'm going to set up wave bookkeeping and connect the chase business account this afternoon. runbook docs/runbooks/wave-setup.md has the chart of accounts. can you walk through it and at the end log the connection in the entity register"
+    },
+    {
+      "id": 7,
+      "should_trigger": true,
+      "query": "ready to sign the contractor agreement with our designer -- it's a real legal doc, runbook is docs/business/contractor-onboarding.md. pls hold my hand thru it, then handle the records updates and a PR"
+    },
+    {
+      "id": 8,
+      "should_trigger": true,
+      "query": "i have to file the annual statement of information with california SOS today, $20 fee, deadline is friday. runbook docs/runbooks/ca-soi.md. walk me through bizfile, capture the receipt as an artifact, log the filing date in the entity register."
+    },
+    {
+      "id": 9,
+      "should_trigger": false,
+      "query": "can you review this PR? it's a refactor of the auth service to use a new session token format. branch is feat/session-tokens, ~600 LOC. mainly want feedback on the migration path and whether the test coverage is adequate."
+    },
+    {
+      "id": 10,
+      "should_trigger": false,
+      "query": "my docker compose is failing with \"network not found\" when i bring up the postgres + redis stack. compose file is in infra/. what's the right way to debug this -- is it a stale network from a previous up?"
+    },
+    {
+      "id": 11,
+      "should_trigger": false,
+      "query": "thinking about upgrading react-router from v5 to v6 in our admin dashboard. what's the migration story look like? we have ~40 routes and a bunch of nested layouts. is there a codemod?"
+    },
+    {
+      "id": 12,
+      "should_trigger": false,
+      "query": "i think there's a bug in our pagination -- when you scroll past page 5 the cursor resets and you start seeing duplicates from page 1. can you look at src/api/feed.ts and figure out what's going on?"
+    },
+    {
+      "id": 13,
+      "should_trigger": false,
+      "query": "audit this swiftui screen for accessibility please -- views/SettingsView.swift. dynamic type, color contrast, voiceover labels. iOS 18 target."
+    },
+    {
+      "id": 14,
+      "should_trigger": false,
+      "query": "trying to decide between the M4 macbook air 15\" and the M4 pro 14\" for general dev work + occasional video editing. mostly want to know about thermals and ram headroom for ios builds. no rush, just curious."
+    },
+    {
+      "id": 15,
+      "should_trigger": false,
+      "query": "how do i rebase my feature branch onto the latest main when there are merge conflicts in package-lock.json? do i delete and regenerate it or actually resolve them?"
+    },
+    {
+      "id": 16,
+      "should_trigger": false,
+      "query": "what should i work on next on this project? prd is docs/prd.md, we just shipped the onboarding flow yesterday. trying to figure out which milestone to tackle next."
+    }
+  ]
+}
