@@ -8,6 +8,8 @@ description: >
 
 Add new enforcement infrastructure (phases, scopes, hooks, commands) to an existing harness. Each operation requires updating multiple files in coordination -- this skill provides the exhaustive checklists.
 
+**Looking to wire GitHub Issues as long-running super-tasks?** That pattern is one coordinated recipe across state file + slash command + permissions + living doc + harness docs. Use `harness-add-issue-led-workflow` instead of assembling the pieces from the operations below.
+
 ## Prerequisites
 
 A harness system must already exist. Verify:
