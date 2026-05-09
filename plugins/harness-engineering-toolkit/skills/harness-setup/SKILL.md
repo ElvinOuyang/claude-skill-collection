@@ -177,3 +177,11 @@ Create/reset            Inject remaining          Block push/PR if          Afte
 ```
 
 **Stop hook loop detection** is the critical pattern. The stop gate uses hash-based loop detection to prevent infinite loops when blocking. See `references/scripts/harness-stop-gate.sh` for the battle-tested implementation. Never create a Stop hook that blocks without this pattern.
+
+## Phase 5: Offer issue-led mode (optional)
+
+After the base harness is in place, ask:
+
+> Do you want to enable **issue-led workflow**? Each GitHub Issue becomes one phase of work, and the agent picks up its current super-task from `gh issue view` + an orchestration plan instead of needing context re-explained every session. Recommended when the project has a long multi-phase delivery roadmap and a GitHub remote.
+
+If yes, route to `harness-add-issue-led-workflow`. Verify `gh auth status` and `git remote get-url origin` first. If no GitHub remote or `gh` is unauthenticated, skip and tell the user they can enable it later by running the skill once those prerequisites are met.
