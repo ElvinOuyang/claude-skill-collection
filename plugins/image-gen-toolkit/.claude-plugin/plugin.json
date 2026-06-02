@@ -1,0 +1,9 @@
+{
+  "name": "image-gen-toolkit",
+  "version": "1.1.0",
+  "description": "Image generation prompting toolkit: workflow-aware ComfyUI prompt composition, model-family adaptation, LoRA catalog matching, and adversarial visual QA handoff",
+  "author": {
+    "name": "Elvin Ouyang"
+  },
+  "skills": "./skills/"
+}

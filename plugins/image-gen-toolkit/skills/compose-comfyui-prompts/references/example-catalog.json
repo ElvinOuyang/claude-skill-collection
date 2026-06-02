@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "id": "expressiveh-style",
+      "kind": "lora",
+      "match": ["expressiveh", "expressive_h"],
+      "model_families": ["pony-xl"],
+      "trigger_words": ["expressiveh"],
+      "positive_additions": ["dynamic expression", "exaggerated emotion"],
+      "negative_additions": [],
+      "recommended_strength_model": 0.8,
+      "recommended_strength_clip": 0.8,
+      "source_url": "https://civitai.com/models/expressiveh-example",
+      "notes": "Style LoRA; keep strength <= 0.85 to avoid overcooked faces."
+    }
+  ]
+}
