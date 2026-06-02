@@ -2,6 +2,7 @@
 *-workspace/
 **/skills/*/workspace/
 evals/results/
+local-red-team-vectors.json
 
 # OS
 .DS_Store

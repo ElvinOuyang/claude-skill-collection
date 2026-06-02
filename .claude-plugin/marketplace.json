@@ -63,6 +63,13 @@
       "description": "Cross-project environment maintenance: env health diagnostics (git/docker/Xcode/MCP) and MCP pruning by token cost and failure rate",
       "version": "1.0.0",
       "keywords": ["environment", "diagnostics", "mcp", "git", "docker"]
+    },
+    {
+      "name": "image-gen-toolkit",
+      "source": "./plugins/image-gen-toolkit",
+      "description": "Image generation prompting toolkit: workflow-aware ComfyUI prompt composition, model-family adaptation, LoRA catalog matching, and adversarial visual QA handoff",
+      "version": "1.1.0",
+      "keywords": ["image-generation", "comfyui", "sdxl", "pony-xl", "illustrious-xl", "lora", "visual-qa"]
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "examplePonyXL_v1.safetensors"
+    }
+  },
+  "2": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "replace-with-lora-filename-substring-v2.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 0.7
+    }
+  }
+}

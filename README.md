@@ -18,6 +18,7 @@ Then install the plugins you need:
 /plugin install ai-dev-toolkit@claude-skill-collection
 /plugin install harness-engineering-toolkit@claude-skill-collection
 /plugin install openclaw-config@claude-skill-collection
+/plugin install image-gen-toolkit@claude-skill-collection
 ```
 
 To enable auto-updates: `/plugin` > Marketplaces tab > select this marketplace > Enable auto-update.
@@ -75,6 +76,14 @@ Mechanical enforcement for Claude Code mandatory workflows.
 |---|---|
 | openclaw-config | Configure OpenClaw self-hosted AI gateway via Docker |
 
+### image-gen-toolkit
+
+Image generation prompting and review skills for ComfyUI workflows.
+
+| Skill | Description |
+|---|---|
+| compose-comfyui-prompts | Compose reusable SDXL, Pony XL, and Illustrious XL prompts; match LoRA requirements from workflow JSON; prepare adversarial visual QA handoffs |
+
 ## Structure
 
 ```
@@ -94,7 +103,10 @@ claude-skill-collection/
     ├── harness-engineering-toolkit/
     │   ├── .claude-plugin/plugin.json
     │   └── skills/
-    └── openclaw-config/
+    ├── openclaw-config/
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/
+    └── image-gen-toolkit/
         ├── .claude-plugin/plugin.json
         └── skills/
 ```

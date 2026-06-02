@@ -1,0 +1,22 @@
+{
+  "4": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": { "ckpt_name": "ponyDiffusionV6XL_v6StartFromHere.safetensors" }
+  },
+  "10": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "Expressiveh_PonyXL.safetensors",
+      "strength_model": 0.9,
+      "strength_clip": 0.9
+    }
+  },
+  "11": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "miyukiShiba_chars_v3.safetensors",
+      "strength_model": 0.8,
+      "strength_clip": 0.8
+    }
+  }
+}

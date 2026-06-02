@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "id": "example-character-lora",
+      "kind": "lora",
+      "match": [
+        "replace-with-lora-filename-substring"
+      ],
+      "model_families": [
+        "pony-xl"
+      ],
+      "trigger_words": [
+        "replace_with_documented_trigger"
+      ],
+      "positive_additions": [],
+      "negative_additions": [],
+      "recommended_strength_model": null,
+      "recommended_strength_clip": null,
+      "source_url": "",
+      "notes": "Delete this example after adding real local components."
+    }
+  ]
+}
